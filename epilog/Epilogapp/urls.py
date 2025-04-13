@@ -1,7 +1,7 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import register_view, home_view, top_view
-from .views import record_create_view  # ← viewsから読み込む！
+from .views import register_view, home_view, top_view, record_create_view, record_list_view
+
 
 
 urlpatterns = [
@@ -11,5 +11,6 @@ urlpatterns = [
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('home/', home_view, name='home'),
     path('record/create/', record_create_view, name='record_create'),
+    path('record/list/', record_list_view, name='record_list'),
     
 ]

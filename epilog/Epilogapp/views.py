@@ -1,8 +1,9 @@
 from django.shortcuts import render, redirect
 from .forms import CustomUserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.shortcuts import render, redirect
 from .forms import SkincareRecordForm
+from .models import SkincareRecord
+from django.contrib.auth.decorators import login_required
 
 
 def register_view(request):
@@ -33,3 +34,8 @@ def record_create_view(request):
     else:
         form = SkincareRecordForm()
     return render(request, 'record_form.html', {'form': form})
+
+@login_required
+def record_list_view(request):
+    records = SkincareRecord.objects.filter(user=request.user).order_by('-record_date')
+    return render(request, 'record_list.html', {'records': records})
