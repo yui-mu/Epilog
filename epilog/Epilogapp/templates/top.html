@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>EpiLog トップページ</title>
+</head>
+<body>
+    <h1>ようこそ EpiLog へ！</h1>
+
+    {% if user.is_authenticated %}
+        <p>こんにちは、{{ user.username }} さん！</p>
+        <p><a href="{% url 'home' %}">ホームへ</a></p>
+        <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit">ログアウト</button>
+        </form>
+    {% else %}
+        <p><a href="{% url 'login' %}">ログイン</a></p>
+        <p><a href="{% url 'register' %}">新規登録</a></p>
+    {% endif %}
+</body>
+</html>
