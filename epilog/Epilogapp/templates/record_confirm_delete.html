@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>削除確認</title>
+</head>
+<body>
+    <h1>この記録を削除してもよろしいですか？</h1>
+    <p>{{ record.record_date }} - {{ record.skin_rating }} - {{ record.skin_condition }}</p>
+
+    <form method="post">
+        {% csrf_token %}
+        <button type="submit">削除する</button>
+        <a href="{% url 'record_list' %}">キャンセル</a>
+    </form>
+</body>
+</html>

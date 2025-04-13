@@ -1,6 +1,13 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
-from .views import register_view, home_view, top_view, record_create_view, record_list_view
+from .views import (
+    register_view, 
+    home_view, top_view, 
+    record_create_view, 
+    record_list_view, 
+    record_edit_view,
+    record_delete_view,
+    )
 
 
 
@@ -12,5 +19,7 @@ urlpatterns = [
     path('home/', home_view, name='home'),
     path('record/create/', record_create_view, name='record_create'),
     path('record/list/', record_list_view, name='record_list'),
+    path('record/edit/<int:pk>/', record_edit_view, name='record_edit'),
+    path('record/delete/<int:pk>/', record_delete_view, name='record_delete'),
     
 ]

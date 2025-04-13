@@ -1,9 +1,10 @@
-from django.shortcuts import render, redirect
-from .forms import CustomUserCreationForm
+from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from .forms import SkincareRecordForm
+from django.http import HttpResponseRedirect
+from django.urls import reverse
+
+from .forms import CustomUserCreationForm, SkincareRecordForm
 from .models import SkincareRecord
-from django.contrib.auth.decorators import login_required
 
 
 def register_view(request):
@@ -39,3 +40,25 @@ def record_create_view(request):
 def record_list_view(request):
     records = SkincareRecord.objects.filter(user=request.user).order_by('-record_date')
     return render(request, 'record_list.html', {'records': records})
+
+@login_required
+def record_edit_view(request, pk):
+    record = get_object_or_404(SkincareRecord, pk=pk, user=request.user)
+
+    if request.method == 'POST':
+        form = SkincareRecordForm(request.POST, request.FILES, instance=record)
+        if form.is_valid():
+            form.save()
+            return redirect('record_list')
+    else:
+        form = SkincareRecordForm(instance=record)
+
+    return render(request, 'record_form.html', {'form': form})
+
+@login_required
+def record_delete_view(request, pk):
+    record = get_object_or_404(SkincareRecord, pk=pk, user=request.user)
+    if request.method == 'POST':
+        record.delete()
+        return redirect('record_list')  # 削除後に一覧に戻る
+    return render(request, 'record_confirm_delete.html', {'record': record})
