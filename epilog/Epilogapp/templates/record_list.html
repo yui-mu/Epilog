@@ -10,7 +10,8 @@
         {% for record in records %}
             <li>
                 {{ record.record_date }} - {{ record.skin_rating }} - {{ record.skin_condition }}
-                <a href="{% url 'record_delete' record.pk %}">削除</a>
+                <a href="{% url 'record_edit' record.pk %}">✏️ 編集</a>
+                <a href="{% url 'record_delete' record.pk %}">🗑️ 削除</a>
         {% empty %}
             <li>まだ記録がありません。</li>
         {% endfor %}

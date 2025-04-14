@@ -11,5 +11,7 @@
         {% csrf_token %}
         <button type="submit">ログアウト</button>
     </form>
+    <p><a href="{% url 'record_create' %}">📥 スキンケア記録を追加</a></p>
+    <p><a href="{% url 'record_list' %}">📋 スキンケア記録一覧を見る</a></p>
 </body>
 </html>
