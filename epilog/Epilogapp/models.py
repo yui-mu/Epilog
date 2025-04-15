@@ -25,6 +25,11 @@ class SkincareRecord(models.Model):
     skin_condition = models.TextField("肌の状態メモ", blank=True)
     skin_rating = models.IntegerField("肌の調子", choices=RATING_CHOICES)
     photo = models.ImageField("肌の写真", upload_to='photos/', blank=True, null=True)
+    
+    morning_items = models.TextField("朝の使用アイテム", blank=True)
+    night_items = models.TextField("夜の使用アイテム", blank=True)
+    concerns = models.TextField("肌悩み", blank=True)
+    ingredients = models.TextField("気になる成分", blank=True)
     created_at = models.DateTimeField("作成日時", auto_now_add=True)
 
     def __str__(self):
