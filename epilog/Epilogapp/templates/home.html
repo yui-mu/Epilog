@@ -2,16 +2,53 @@
 <html lang="ja">
 <head>
     <meta charset="UTF-8">
-    <title>ホーム</title>
+    <title>ホーム | EpiLog</title>
+    <style>
+        body {
+            font-family: sans-serif;
+            text-align: center;
+            padding: 40px;
+            background-color: #f9f9f9;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+        }
+        .nav-links {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 15px;
+            max-width: 300px;
+            margin: 0 auto;
+        }
+        .nav-links a {
+            display: block;
+            padding: 12px 20px;
+            background-color: #9dd3c5;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            width: 100%;
+            transition: 0.3s;
+        }
+        .nav-links a:hover {
+            background-color: #7cc6b1;
+        }
+    </style>
 </head>
 <body>
-    <h1>ようこそ、{{ user.username }} さん！</h1>
-    <p>これはログイン済ユーザーだけが見られるホーム画面です。</p>
-    <form method="post" action="{% url 'logout' %}">
-        {% csrf_token %}
-        <button type="submit">ログアウト</button>
-    </form>
-    <p><a href="{% url 'record_create' %}">📥 スキンケア記録を追加</a></p>
-    <p><a href="{% url 'record_list' %}">📋 スキンケア記録一覧を見る</a></p>
+
+    <h1>{{ user.nickname }}さん、ようこそ！</h1>
+
+    <div class="nav-links">
+        <a href="{% url 'record_create' %}">📥 スキンケア記録を追加する</a>
+        <a href="{% url 'record_list' %}">📋 記録を一覧で見る</a>
+        <a href="#">❤️ お気に入りを見る（準備中）</a>
+        <a href="#">💬 アドバイザーに相談する（準備中）</a>
+        <a href="{% url 'logout' %}">🚪 ログアウト</a>
+    </div>
+
 </body>
 </html>
+
