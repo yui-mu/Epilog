@@ -5,6 +5,9 @@ from django.urls import reverse
 
 from .forms import CustomUserCreationForm, SkincareRecordForm
 from .models import SkincareRecord
+from django.contrib.auth.decorators import login_required
+from django.http import JsonResponse
+from .models import SkincareRecord
 
 
 def register_view(request):
@@ -36,12 +39,10 @@ def record_create_view(request):
         form = SkincareRecordForm()
     return render(request, 'record_form.html', {'form': form})
 
-@login_required
 def record_list_view(request):
     records = SkincareRecord.objects.filter(user=request.user).order_by('-record_date')
     return render(request, 'record_list.html', {'records': records})
 
-@login_required
 def record_edit_view(request, pk):
     record = get_object_or_404(SkincareRecord, pk=pk, user=request.user)
 
@@ -55,10 +56,25 @@ def record_edit_view(request, pk):
 
     return render(request, 'record_form.html', {'form': form})
 
-@login_required
 def record_delete_view(request, pk):
     record = get_object_or_404(SkincareRecord, pk=pk, user=request.user)
     if request.method == 'POST':
         record.delete()
         return redirect('record_list')  # 削除後に一覧に戻る
     return render(request, 'record_confirm_delete.html', {'record': record})
+
+def calendar_view(request):
+    return render(request, 'record_calendar.html')
+
+def calendar_events_view(request):
+    records = SkincareRecord.objects.filter(user=request.user)
+    events = []
+
+    for record in records:
+        events.append({
+            "title": "記録あり",
+            "start": str(record.record_date),
+            "url": f"/record/{record.pk}/detail/"
+        })
+
+    return JsonResponse(events, safe=False)

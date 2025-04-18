@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>スキンケア記録カレンダー</title>
+
+    <!-- FullCalendarのCSS -->
+    <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.css" rel="stylesheet" />
+
+    <style>
+        body {
+            font-family: sans-serif;
+            padding: 20px;
+            text-align: center;
+        }
+        #calendar {
+            max-width: 900px;
+            margin: 40px auto;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>📅 スキンケア記録カレンダー</h1>
+
+    <div id="calendar"></div>
+
+    <p><a href="{% url 'home' %}">← ホームに戻る</a></p>
+
+    <!-- FullCalendarのJS -->
+    <script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            const calendarEl = document.getElementById('calendar');
+    
+            const calendar = new FullCalendar.Calendar(calendarEl, {
+                initialView: 'dayGridMonth',
+                locale: 'ja',
+                events: '/record/calendar/events/',  
+                eventClick: function(info) {
+                    // イベントをクリックしたらリンクに移動
+                    window.location.href = info.event.url;
+                }
+            });
+    
+            calendar.render();
+        });
+    </script>
+
+</body>
+</html>
+

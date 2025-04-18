@@ -7,6 +7,8 @@ from .views import (
     record_list_view, 
     record_edit_view,
     record_delete_view,
+    calendar_view,
+    calendar_events_view
     )
 
 
@@ -21,5 +23,7 @@ urlpatterns = [
     path('record/list/', record_list_view, name='record_list'),
     path('record/edit/<int:pk>/', record_edit_view, name='record_edit'),
     path('record/delete/<int:pk>/', record_delete_view, name='record_delete'),
+    path('record/calendar/', calendar_view, name='record_calendar'),
+    path('record/calendar/events/', calendar_events_view, name='calendar_events'),
     
 ]
