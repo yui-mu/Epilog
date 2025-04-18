@@ -10,6 +10,7 @@ from django.http import JsonResponse
 from .models import SkincareRecord
 
 
+
 def register_view(request):
     if request.method == 'POST':
         form = CustomUserCreationForm(request.POST)
@@ -78,3 +79,7 @@ def calendar_events_view(request):
         })
 
     return JsonResponse(events, safe=False)
+
+def record_detail_view(request, pk):
+    record = get_object_or_404(SkincareRecord, pk=pk, user=request.user)
+    return render(request, 'record_detail.html', {'record': record})
