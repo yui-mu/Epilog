@@ -9,9 +9,19 @@
     <ul>
         {% for record in records %}
             <li>
-                {{ record.record_date }} - {{ record.skin_rating }} - {{ record.skin_condition }}
-                <a href="{% url 'record_edit' record.pk %}">✏️ 編集</a>
-                <a href="{% url 'record_delete' record.pk %}">🗑️ 削除</a>
+                <strong>{{ record.record_date }}</strong><br>
+                 肌の調子：{{ record.get_skin_rating_display }}<br>
+                 肌の状態：{{ record.skin_condition }}<br>
+                 朝のアイテム：{{ record.morning_items }}<br>
+                 夜のアイテム：{{ record.night_items }}<br>
+                 肌悩み：{{ record.concerns }}<br>
+                 成分：{{ record.ingredients }}<br>
+                {% if record.photo %}
+                 <img src="{{ record.photo.url }}" alt="肌の写真" width="150"><br>
+                 {% endif %}
+                  <a href="{% url 'record_edit' record.pk %}">✏️ 編集</a> |
+                  <a href="{% url 'record_delete' record.pk %}">🗑️ 削除</a>
+                 <hr>
         {% empty %}
             <li>まだ記録がありません。</li>
         {% endfor %}
