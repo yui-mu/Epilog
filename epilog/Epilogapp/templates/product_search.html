@@ -16,19 +16,24 @@
     <hr>
 
     <h2>📦 検索結果</h2>
-    {% if products %}
-        <ul>
-        {% for product in products %}
-            <li>
-                <strong>{{ product.name }}</strong><br>
-                ブランド: {{ product.brand }}<br>
-                カテゴリ: {{ product.category }}
-            </li>
-        {% endfor %}
-        </ul>
-    {% else %}
-        <p>該当する商品はありませんでした。</p>
-    {% endif %}
+{% if products %}
+    <ul>
+    {% for product in products %}
+        <li>
+            <strong>{{ product.name }}</strong><br>
+            ブランド: {{ product.brand }}<br>
+            カテゴリ: {{ product.category }}<br>
+
+            <form method="post" action="{% url 'add_favorite' product.id %}">
+                {% csrf_token %}
+                <button type="submit">❤️ お気に入りに追加</button>
+            </form>
+        </li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>該当する商品はありませんでした。</p>
+{% endif %}
 
     <p><a href="{% url 'home' %}">← ホームに戻る</a></p>
 </body>

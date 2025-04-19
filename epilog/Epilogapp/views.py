@@ -9,6 +9,9 @@ from django.http import JsonResponse
 from .forms import ProductForm
 from .forms import ProductSearchForm
 from .models import Product
+from .models import Favorite
+
+
 
 
 
@@ -29,6 +32,7 @@ def home_view(request):
 def top_view(request):
     return render(request, 'top.html')
 
+@login_required
 def record_create_view(request):
     if request.method == 'POST':
         form = SkincareRecordForm(request.POST, request.FILES)
@@ -41,10 +45,12 @@ def record_create_view(request):
         form = SkincareRecordForm()
     return render(request, 'record_form.html', {'form': form})
 
+@login_required
 def record_list_view(request):
     records = SkincareRecord.objects.filter(user=request.user).order_by('-record_date')
     return render(request, 'record_list.html', {'records': records})
 
+@login_required
 def record_edit_view(request, pk):
     record = get_object_or_404(SkincareRecord, pk=pk, user=request.user)
 
@@ -58,6 +64,7 @@ def record_edit_view(request, pk):
 
     return render(request, 'record_form.html', {'form': form})
 
+@login_required
 def record_delete_view(request, pk):
     record = get_object_or_404(SkincareRecord, pk=pk, user=request.user)
     if request.method == 'POST':
@@ -65,9 +72,11 @@ def record_delete_view(request, pk):
         return redirect('record_list')  # 削除後に一覧に戻る
     return render(request, 'record_confirm_delete.html', {'record': record})
 
+@login_required
 def calendar_view(request):
     return render(request, 'record_calendar.html')
 
+@login_required
 def calendar_events_view(request):
     records = SkincareRecord.objects.filter(user=request.user)
     events = []
@@ -81,10 +90,12 @@ def calendar_events_view(request):
 
     return JsonResponse(events, safe=False)
 
+@login_required
 def record_detail_view(request, pk):
     record = get_object_or_404(SkincareRecord, pk=pk, user=request.user)
     return render(request, 'record_detail.html', {'record': record})
 
+@login_required
 def product_create_view(request):
     if request.method == 'POST':
         form = ProductForm(request.POST)
@@ -95,6 +106,7 @@ def product_create_view(request):
         form = ProductForm()
     return render(request, 'product_form.html', {'form': form})
 
+@login_required
 def product_search_view(request):
     form = ProductSearchForm(request.GET or None)
     products = Product.objects.all()
@@ -120,3 +132,22 @@ def product_search_view(request):
         'form': form,
         'products': products,
     })
+
+@login_required
+def add_favorite_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+
+    favorite, created = Favorite.objects.get_or_create(user=request.user, product=product)
+
+    if created:
+        message = "お気に入りに追加しました！"
+    else:
+        message = "すでにお気に入りに登録されています。"
+
+    # ホームや検索結果ページにリダイレクト
+    return redirect('product_search')
+
+@login_required
+def favorite_list_view(request):
+    favorites = Favorite.objects.filter(user=request.user).select_related('product')
+    return render(request, 'favorite_list.html', {'favorites': favorites})

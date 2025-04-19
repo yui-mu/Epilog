@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>お気に入り一覧</title>
+</head>
+<body>
+    <h1>❤️ お気に入り一覧</h1>
+
+    {% if favorites %}
+        <ul>
+        {% for fav in favorites %}
+            <li>
+                <strong>{{ fav.product.name }}</strong><br>
+                ブランド: {{ fav.product.brand }}<br>
+                カテゴリ: {{ fav.product.category }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>お気に入りはまだ登録されていません。</p>
+    {% endif %}
+
+    <p><a href="{% url 'product_search' %}">← 商品検索に戻る</a></p>
+</body>
+</html>

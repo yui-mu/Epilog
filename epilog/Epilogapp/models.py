@@ -1,6 +1,9 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
+from django.db import models
+
+
 
 class CustomUser(AbstractUser):
     nickname = models.CharField("ニックネーム", max_length=64)
@@ -49,20 +52,6 @@ class Concern(models.Model):
     def __str__(self):
         return self.name
 
-# 成分モデル
-class Ingredient(models.Model):
-    name = models.CharField("成分名", max_length=100)
-
-    def __str__(self):
-        return self.name
-
-# 肌悩みモデル
-class Concern(models.Model):
-    name = models.CharField("肌悩み", max_length=100)
-
-    def __str__(self):
-        return self.name
-
 # 商品モデル
 class Product(models.Model):
     name = models.CharField("商品名", max_length=200)
@@ -76,4 +65,16 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.name}（{self.brand}）"
+    
+class Favorite(models.Model):
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    product = models.ForeignKey('Product', on_delete=models.CASCADE)
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    class Meta:
+        unique_together = ('user', 'product')
+
+    def __str__(self):
+        return f"{self.user.username} ❤️ {self.product.name}"
+    
 
