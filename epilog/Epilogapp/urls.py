@@ -9,7 +9,9 @@ from .views import (
     record_delete_view,
     calendar_view,
     calendar_events_view,
-    record_detail_view
+    record_detail_view,
+    product_create_view,
+    product_search_view
     )
 
 
@@ -27,6 +29,8 @@ urlpatterns = [
     path('record/calendar/', calendar_view, name='record_calendar'),
     path('record/calendar/events/', calendar_events_view, name='calendar_events'),
     path('record/<int:pk>/detail/', record_detail_view, name='record_detail'),
+    path('product/create/', product_create_view, name='product_create'),
+    path('product/search/', product_search_view, name='product_search'),
 
     
 ]

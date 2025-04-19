@@ -2,6 +2,8 @@ from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from .models import CustomUser
 from .models import SkincareRecord
+from .models import Product
+from .models import Ingredient, Concern
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
@@ -30,3 +32,29 @@ class SkincareRecordForm(forms.ModelForm):
             'concerns': forms.Textarea(attrs={'rows': 2}),
             'ingredients': forms.Textarea(attrs={'rows': 2}),
         }
+        
+class ProductForm(forms.ModelForm):
+    class Meta:
+        model = Product
+        fields = ['name', 'brand', 'category', 'ingredients', 'concerns']
+        widgets = {
+            'ingredients': forms.CheckboxSelectMultiple,
+            'concerns': forms.CheckboxSelectMultiple,
+        }
+        
+class ProductSearchForm(forms.Form):
+    name = forms.CharField(label='商品名', required=False)
+    brand = forms.CharField(label='ブランド名', required=False)
+    category = forms.CharField(label='カテゴリ', required=False)
+    ingredients = forms.ModelMultipleChoiceField(
+        label='配合成分',
+        queryset=Ingredient.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )
+    concerns = forms.ModelMultipleChoiceField(
+        label='対応する肌悩み',
+        queryset=Concern.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False
+    )

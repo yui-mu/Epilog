@@ -5,9 +5,10 @@ from django.urls import reverse
 
 from .forms import CustomUserCreationForm, SkincareRecordForm
 from .models import SkincareRecord
-from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse
-from .models import SkincareRecord
+from .forms import ProductForm
+from .forms import ProductSearchForm
+from .models import Product
 
 
 
@@ -83,3 +84,39 @@ def calendar_events_view(request):
 def record_detail_view(request, pk):
     record = get_object_or_404(SkincareRecord, pk=pk, user=request.user)
     return render(request, 'record_detail.html', {'record': record})
+
+def product_create_view(request):
+    if request.method == 'POST':
+        form = ProductForm(request.POST)
+        if form.is_valid():
+            form.save()
+            return redirect('home')
+    else:
+        form = ProductForm()
+    return render(request, 'product_form.html', {'form': form})
+
+def product_search_view(request):
+    form = ProductSearchForm(request.GET or None)
+    products = Product.objects.all()
+
+    if form.is_valid():
+        name = form.cleaned_data.get('name')
+        brand = form.cleaned_data.get('brand')
+        category = form.cleaned_data.get('category')
+        ingredients = form.cleaned_data.get('ingredients')
+        concerns = form.cleaned_data.get('concerns')
+
+        if name:
+            products = products.filter(name__icontains=name)
+        if brand:
+            products = products.filter(brand__icontains=brand)
+        if category:
+            products = products.filter(category__icontains=category)
+        if ingredients:
+                products = products.filter(ingredients__in=ingredients).distinct()
+        if concerns:
+                products = products.filter(concerns__in=concerns).distinct()
+    return render(request, 'product_search.html', {
+        'form': form,
+        'products': products,
+    })

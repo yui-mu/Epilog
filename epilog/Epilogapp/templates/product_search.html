@@ -1,0 +1,37 @@
+
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>商品検索</title>
+</head>
+<body>
+    <h1>🔍 商品検索</h1>
+
+    <form method="get">
+        {{ form.as_p }}
+        <button type="submit">検索する</button>
+    </form>
+
+    <hr>
+
+    <h2>📦 検索結果</h2>
+    {% if products %}
+        <ul>
+        {% for product in products %}
+            <li>
+                <strong>{{ product.name }}</strong><br>
+                ブランド: {{ product.brand }}<br>
+                カテゴリ: {{ product.category }}
+            </li>
+        {% endfor %}
+        </ul>
+    {% else %}
+        <p>該当する商品はありませんでした。</p>
+    {% endif %}
+
+    <p><a href="{% url 'home' %}">← ホームに戻る</a></p>
+</body>
+</html>
+
+
