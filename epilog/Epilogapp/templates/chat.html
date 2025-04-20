@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>チャット相談</title>
+</head>
+<body>
+    <h1>💬 チャット相談</h1>
+
+    <div style="border:1px solid #ccc; padding:10px; height:300px; overflow-y:scroll; margin-bottom:20px;">
+        {% for msg in messages %}
+            <p><strong>{{ msg.sender.username }}</strong>: {{ msg.content }} <br><small>{{ msg.timestamp }}</small></p>
+        {% endfor %}
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+    
+        {% if user_list %}
+            <label for="receiver">送信先ユーザー:</label>
+            <select name="receiver">
+                {% for u in user_list %}
+                    <option value="{{ u.id }}">{{ u.username }}</option>
+                {% endfor %}
+            </select><br>
+        {% endif %}
+    
+        <textarea name="content" rows="3" cols="40" placeholder="メッセージを入力..."></textarea><br>
+        <button type="submit">送信</button>
+    </form>
+
+    <p><a href="{% url 'home' %}">← ホームに戻る</a></p>
+</body>
+</html>

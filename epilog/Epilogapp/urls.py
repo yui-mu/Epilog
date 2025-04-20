@@ -14,7 +14,8 @@ from .views import (
     product_search_view,
     add_favorite_view,
     favorite_list_view,
-    remove_favorite_view
+    remove_favorite_view,
+    chat_view
     )
 
 
@@ -37,7 +38,7 @@ urlpatterns = [
     path('favorite/add/<int:product_id>/', add_favorite_view, name='add_favorite'),
     path('favorites/', favorite_list_view, name='favorite_list'),
     path('favorite/remove/<int:product_id>/', remove_favorite_view, name='remove_favorite'),
-
+    path('chat/', chat_view, name='chat'),
 
     
 ]

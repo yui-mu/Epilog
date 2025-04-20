@@ -77,4 +77,19 @@ class Favorite(models.Model):
     def __str__(self):
         return f"{self.user.username} ❤️ {self.product.name}"
     
+class Message(models.Model):
+    sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    receiver = models.ForeignKey(
+    settings.AUTH_USER_MODEL,
+    on_delete=models.CASCADE,
+    related_name='received_messages',
+    null=True  
+)
+    content = models.TextField("メッセージ内容")
+    timestamp = models.DateTimeField("送信日時", auto_now_add=True)
+
+    def __str__(self):
+        return f"{self.sender.username}: {self.content[:20]}"
+
+
 

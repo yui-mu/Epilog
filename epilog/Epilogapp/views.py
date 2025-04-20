@@ -10,6 +10,9 @@ from .forms import ProductForm
 from .forms import ProductSearchForm
 from .models import Product
 from .models import Favorite
+from .models import Message
+from django.utils import timezone
+from .models import CustomUser
 
 
 
@@ -161,3 +164,54 @@ def remove_favorite_view(request, product_id):
     if favorite:
         favorite.delete()
     return redirect('favorite_list')
+
+@login_required
+def chat_view(request):
+    user = request.user
+    advisor = None
+
+    if not user.is_advisor:
+        advisor = CustomUser.objects.filter(is_advisor=True).first()
+
+    if user.is_advisor:
+        messages = Message.objects.filter(sender=user) | Message.objects.filter(receiver=user)
+    else:
+        messages = Message.objects.filter(sender=user) | Message.objects.filter(receiver=user)
+        if advisor:
+            messages |= Message.objects.filter(receiver=advisor)
+
+    messages = messages.order_by('timestamp')
+
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content:
+            if user.is_advisor:
+                receiver_id = request.POST.get('receiver')
+                try:
+                    receiver = CustomUser.objects.get(id=receiver_id)
+                    Message.objects.create(sender=user, receiver=receiver, content=content)
+                except CustomUser.DoesNotExist:
+                    pass  # 無効なユーザーIDだった場合
+            else:
+                if advisor:
+                    Message.objects.create(sender=user, receiver=advisor, content=content)
+        return redirect('chat')
+
+    # アドバイザー用：全ユーザー一覧を渡す
+    user_list = CustomUser.objects.filter(is_advisor=False) if user.is_advisor else None
+
+    return render(request, 'chat.html', {
+        'messages': messages,
+        'user_list': user_list,
+    })
+
+
+
+
+
+
+
+
+
+
+
