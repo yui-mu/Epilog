@@ -1,20 +1,11 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
-from django.http import HttpResponseRedirect
-from django.urls import reverse
-
-from .forms import CustomUserCreationForm, SkincareRecordForm
-from .models import SkincareRecord
-from django.http import JsonResponse
-from .forms import ProductForm
-from .forms import ProductSearchForm
-from .models import Product
-from .models import Favorite
-from .models import Message
+from django.http import JsonResponse, HttpResponseRedirect
+from django.db.models import Q
 from django.utils import timezone
-from .models import CustomUser
 
-
+from .forms import CustomUserCreationForm, SkincareRecordForm, ProductForm, ProductSearchForm
+from .models import SkincareRecord, Product, Favorite, Message, CustomUser
 
 
 
@@ -205,8 +196,58 @@ def chat_view(request):
         'user_list': user_list,
     })
 
+@login_required
+def chat_user_list_view(request):
+    user = request.user
 
+    # アドバイザーだけがこの一覧を見られるように制限
+    if not user.is_advisor:
+        return redirect('chat')
 
+    # このアドバイザーとやりとりしたことのあるユーザー一覧を取得
+    user_ids = Message.objects.filter(
+        Q(sender=user) | Q(receiver=user)
+    ).values_list('sender', 'receiver')
+
+    # senderやreceiverにアドバイザー自身も含まれているので、自分を除外し、ユニークに
+    other_user_ids = set()
+    for sender_id, receiver_id in user_ids:
+        if sender_id != user.id:
+            other_user_ids.add(sender_id)
+        if receiver_id != user.id:
+            other_user_ids.add(receiver_id)
+
+    users = CustomUser.objects.filter(id__in=other_user_ids)
+
+    return render(request, 'chat_user_list.html', {'users': users})
+
+@login_required
+def chat_with_user_view(request, user_id):
+    user = request.user
+
+    # ログインユーザーがアドバイザーでなければ拒否
+    if not user.is_advisor:
+        return redirect('chat')
+
+    # 相手ユーザーを取得
+    chat_user = get_object_or_404(CustomUser, id=user_id)
+
+    # このアドバイザーとユーザー間のメッセージのみ取得
+    messages = Message.objects.filter(
+        (Q(sender=user, receiver=chat_user) | Q(sender=chat_user, receiver=user))
+    ).order_by('timestamp')
+
+    # メッセージ送信処理（POST）
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content:
+            Message.objects.create(sender=user, receiver=chat_user, content=content)
+            return redirect('chat_with_user', user_id=chat_user.id)
+
+    return render(request, 'chat_with_user.html', {
+        'chat_user': chat_user,
+        'messages': messages,
+    })
 
 
 

@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>チャットユーザー一覧</title>
+</head>
+<body>
+    <h1>💬 チャット相手一覧</h1>
+
+    {% if users %}
+        <ul>
+            {% for u in users %}
+                <li>
+                    {{ u.username }}（{{ u.nickname }}）<br>
+                    <a href="{% url 'chat_with_user' u.id %}">チャットを見る</a>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>チャット履歴のあるユーザーはいません。</p>
+    {% endif %}
+
+    <p><a href="{% url 'home' %}">← ホームに戻る</a></p>
+</body>
+</html>

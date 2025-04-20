@@ -15,7 +15,9 @@ from .views import (
     add_favorite_view,
     favorite_list_view,
     remove_favorite_view,
-    chat_view
+    chat_view,
+    chat_user_list_view,
+    chat_with_user_view
     )
 
 
@@ -39,6 +41,8 @@ urlpatterns = [
     path('favorites/', favorite_list_view, name='favorite_list'),
     path('favorite/remove/<int:product_id>/', remove_favorite_view, name='remove_favorite'),
     path('chat/', chat_view, name='chat'),
+    path('chat/users/', chat_user_list_view, name='chat_user_list'),
+    path('chat/<int:user_id>/', chat_with_user_view, name='chat_with_user'),
 
     
 ]

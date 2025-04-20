@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ chat_user.username }} とのチャット</title>
+</head>
+<body>
+    <h1>💬 {{ chat_user.nickname }} さんとのチャット</h1>
+
+    <div style="border:1px solid #ccc; padding:10px; height:300px; overflow-y:scroll; margin-bottom:20px;">
+        {% for msg in messages %}
+            <p>
+                <strong>{{ msg.sender.username }}</strong>: {{ msg.content }}<br>
+                <small>{{ msg.timestamp }}</small>
+            </p>
+        {% endfor %}
+    </div>
+
+    <form method="post">
+        {% csrf_token %}
+        <textarea name="content" rows="3" cols="40" placeholder="メッセージを入力..."></textarea><br>
+        <button type="submit">送信</button>
+    </form>
+
+    <p><a href="{% url 'chat_user_list' %}">← 一覧に戻る</a></p>
+</body>
+</html>
