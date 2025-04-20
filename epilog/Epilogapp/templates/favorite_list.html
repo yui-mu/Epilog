@@ -14,6 +14,10 @@
                 <strong>{{ fav.product.name }}</strong><br>
                 ブランド: {{ fav.product.brand }}<br>
                 カテゴリ: {{ fav.product.category }}
+                <form method="post" action="{% url 'remove_favorite' fav.product.id %}">
+                    {% csrf_token %}
+                    <button type="submit">🗑️ 削除</button>
+                </form>
             </li>
         {% endfor %}
         </ul>

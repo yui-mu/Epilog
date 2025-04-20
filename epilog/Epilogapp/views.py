@@ -109,14 +109,16 @@ def product_create_view(request):
 @login_required
 def product_search_view(request):
     form = ProductSearchForm(request.GET or None)
-    products = Product.objects.all()
+    products = Product.objects.none()  # 初期は空にする
 
-    if form.is_valid():
+    if form.is_valid() and request.GET:  # ← GETデータがあるときだけ実行！
         name = form.cleaned_data.get('name')
         brand = form.cleaned_data.get('brand')
         category = form.cleaned_data.get('category')
         ingredients = form.cleaned_data.get('ingredients')
         concerns = form.cleaned_data.get('concerns')
+
+        products = Product.objects.all()
 
         if name:
             products = products.filter(name__icontains=name)
@@ -125,9 +127,10 @@ def product_search_view(request):
         if category:
             products = products.filter(category__icontains=category)
         if ingredients:
-                products = products.filter(ingredients__in=ingredients).distinct()
+            products = products.filter(ingredients__in=ingredients).distinct()
         if concerns:
-                products = products.filter(concerns__in=concerns).distinct()
+            products = products.filter(concerns__in=concerns).distinct()
+
     return render(request, 'product_search.html', {
         'form': form,
         'products': products,
@@ -151,3 +154,10 @@ def add_favorite_view(request, product_id):
 def favorite_list_view(request):
     favorites = Favorite.objects.filter(user=request.user).select_related('product')
     return render(request, 'favorite_list.html', {'favorites': favorites})
+
+@login_required
+def remove_favorite_view(request, product_id):
+    favorite = Favorite.objects.filter(user=request.user, product_id=product_id).first()
+    if favorite:
+        favorite.delete()
+    return redirect('favorite_list')
