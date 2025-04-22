@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>記録一覧</title>
-</head>
-<body>
+{% extends 'base.html' %}
+   
+{% block content %}
     <h1>スキンケア記録一覧</h1>
     <ul>
         {% for record in records %}
@@ -26,6 +22,5 @@
             <li>まだ記録がありません。</li>
         {% endfor %}
     </ul>
-    <p><a href="{% url 'home' %}">← ホームに戻る</a></p>
-</body>
-</html>
+{% endblock %}
+

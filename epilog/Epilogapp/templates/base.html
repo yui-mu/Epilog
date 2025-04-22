@@ -1,0 +1,96 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}Epilog{% endblock %}</title>
+  <style>
+    body {
+      font-family: "Noto Sans JP", sans-serif;
+      background-color: #f5f9f6; /* やさしいミントベース */
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+  
+    nav {
+      background-color: #e0ebe3; /* 淡いグリーン系 */
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 30px;
+      border-bottom: 1px solid #c1d4c9;
+    }
+  
+    nav a {
+      background-color: #a7d7c5;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+  
+    nav a:hover {
+      background-color: #86cbb0;
+    }
+  
+    h1, h2 {
+      font-weight: 600;
+      color: #2e5947;
+      margin-bottom: 20px;
+    }
+  
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+  
+    button, input[type="submit"] {
+      background-color: #a7d7c5;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+  
+    button:hover, input[type="submit"]:hover {
+      background-color: #86cbb0;
+    }
+  
+    .card {
+      background-color: white;
+      border: 1px solid #ddd;
+      border-radius: 12px;
+      padding: 16px;
+      margin-bottom: 16px;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+  </style>
+</head>
+<body>
+  {% if user.is_authenticated %}
+    <nav>
+      <a href="{% url 'home' %}">🏠 ホーム</a>
+      <a href="{% url 'record_list' %}">📝 記録一覧</a>
+      <a href="{% url 'product_search' %}">🔍 商品検索</a>
+      <a href="{% url 'favorite_list' %}">❤️ お気に入り</a>
+      <a href="{% url 'chat' %}">💬 チャット</a>
+      <a href="{% url 'logout' %}" style="float:right;">🚪 ログアウト</a>
+      {% if user.is_advisor %}
+        <a href="{% url 'chat_user_list' %}">👥 ユーザー一覧</a>
+      {% endif %}
+    </nav>
+  {% endif %}
+
+  <div class="container">
+    {% block content %}
+    <!-- 各ページの内容がここに入る -->
+    {% endblock %}
+  </div>
+</body>
+</html>

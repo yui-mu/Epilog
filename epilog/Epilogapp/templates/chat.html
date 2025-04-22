@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>チャット相談</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block content %}
     <h1>💬 チャット相談</h1>
 
     <div style="border:1px solid #ccc; padding:10px; height:300px; overflow-y:scroll; margin-bottom:20px;">
@@ -28,7 +23,4 @@
         <textarea name="content" rows="3" cols="40" placeholder="メッセージを入力..."></textarea><br>
         <button type="submit">送信</button>
     </form>
-
-    <p><a href="{% url 'home' %}">← ホームに戻る</a></p>
-</body>
-</html>
+{% endblock %}

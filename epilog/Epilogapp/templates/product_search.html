@@ -1,11 +1,6 @@
 
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>商品検索</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block content %}
     <h1>🔍 商品検索</h1>
 
     <form method="get">
@@ -16,7 +11,7 @@
     <hr>
 
     <h2>📦 検索結果</h2>
-{% if products %}
+    {% if products %}
     <ul>
     {% for product in products %}
         <li>
@@ -31,12 +26,11 @@
         </li>
     {% endfor %}
     </ul>
-{% else %}
-    <p>該当する商品はありませんでした。</p>
-{% endif %}
+    {% else %}
+        <p>該当する商品はありませんでした。</p>
+    {% endif %}
+{% endblock %}
 
-    <p><a href="{% url 'home' %}">← ホームに戻る</a></p>
-</body>
-</html>
+   
 
 

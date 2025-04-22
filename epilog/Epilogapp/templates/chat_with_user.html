@@ -1,10 +1,5 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>{{ chat_user.username }} とのチャット</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% block content %}
     <h1>💬 {{ chat_user.nickname }} さんとのチャット</h1>
     
     <p>
@@ -29,5 +24,4 @@
     </form>
 
     <p><a href="{% url 'chat_user_list' %}">← 一覧に戻る</a></p>
-</body>
-</html>
+{% endblock %}

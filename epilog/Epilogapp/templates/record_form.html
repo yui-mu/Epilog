@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>スキンケア記録</title>
-</head>
-<body>
+{% extends 'base.html' %}
+   
+{% block content %}
     <h1>スキンケア記録フォーム</h1>
 
     <form method="post" enctype="multipart/form-data">
@@ -14,5 +10,4 @@
     </form>
 
     <p><a href="{% url 'home' %}">← ホームに戻る</a></p>
-</body>
-</html>
+{% endblock %}

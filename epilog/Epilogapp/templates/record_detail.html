@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>記録の詳細</title>
-</head>
-<body>
+{% extends 'base.html' %}
+   
+{% block content %}
     <h1>📋 記録の詳細</h1>
 
     <p><strong>日付：</strong>{{ record.record_date }}</p>
@@ -21,5 +17,4 @@
     {% endif %}
 
     <p><a href="{% url 'record_list' %}">← 一覧に戻る</a></p>
-</body>
-</html>
+{% endblock %}
