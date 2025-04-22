@@ -17,7 +17,8 @@ from .views import (
     remove_favorite_view,
     chat_view,
     chat_user_list_view,
-    chat_with_user_view
+    chat_with_user_view,
+    user_skincare_record_list_view
     )
 
 
@@ -43,6 +44,7 @@ urlpatterns = [
     path('chat/', chat_view, name='chat'),
     path('chat/users/', chat_user_list_view, name='chat_user_list'),
     path('chat/<int:user_id>/', chat_with_user_view, name='chat_with_user'),
+    path('records/user/<int:user_id>/', user_skincare_record_list_view, name='user_skincare_record_list'),
 
     
 ]

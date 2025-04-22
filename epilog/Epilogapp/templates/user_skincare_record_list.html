@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <title>{{ target_user.nickname }} さんのスキンケア記録一覧</title>
+</head>
+<body>
+    <h1>📄 {{ target_user.nickname }} さんのスキンケア記録一覧</h1>
+
+    {% if records %}
+        <ul>
+            {% for record in records %}
+                <li>
+                    🗓️ {{ record.record_date }}<br>
+                    🌟 肌の調子：{{ record.get_skin_rating_display }}<br>
+                    📝 メモ：{{ record.skin_condition|default:"なし" }}<br>
+                    <hr>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>記録がまだありません。</p>
+    {% endif %}
+
+    <p><a href="{% url 'chat_with_user' target_user.id %}">← チャットに戻る</a></p>
+</body>
+</html>

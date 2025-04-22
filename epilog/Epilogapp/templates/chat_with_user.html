@@ -6,6 +6,12 @@
 </head>
 <body>
     <h1>💬 {{ chat_user.nickname }} さんとのチャット</h1>
+    
+    <p>
+        <a href="{% url 'user_skincare_record_list' chat_user.id %}">
+            📄 {{ chat_user.nickname }} さんのスキンケア記録を見る
+        </a>
+    </p>
 
     <div style="border:1px solid #ccc; padding:10px; height:300px; overflow-y:scroll; margin-bottom:20px;">
         {% for msg in messages %}

@@ -249,6 +249,23 @@ def chat_with_user_view(request, user_id):
         'messages': messages,
     })
 
+@login_required
+def user_skincare_record_list_view(request, user_id):
+    advisor = request.user
+
+    # アドバイザー以外はアクセス不可
+    if not advisor.is_advisor:
+        return redirect('home')
+
+    # 対象ユーザーの記録を取得
+    target_user = get_object_or_404(CustomUser, id=user_id)
+    records = SkincareRecord.objects.filter(user=target_user).order_by('-record_date')
+
+    return render(request, 'user_skincare_record_list.html', {
+        'target_user': target_user,
+        'records': records,
+    })
+ 
 
 
 
