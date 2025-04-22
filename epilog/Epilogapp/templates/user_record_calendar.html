@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>{{ target_user.nickname }} さんの記録カレンダー</title>
+  <link href="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.css" rel="stylesheet">
+  <script src="https://cdn.jsdelivr.net/npm/fullcalendar@5.11.3/main.min.js"></script>
+</head>
+<body>
+  <h1>📅 {{ target_user.nickname }} さんの記録カレンダー</h1>
+
+  <div id="calendar"></div>
+
+  <p><a href="{% url 'chat_with_user' target_user.id %}">← チャットに戻る</a></p>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const calendarEl = document.getElementById('calendar');
+      const calendar = new FullCalendar.Calendar(calendarEl, {
+        initialView: 'dayGridMonth',
+        locale: 'ja',
+        height: 'auto',
+        events: '/record/user/{{ target_user.id }}/events/',
+        eventClick: function(info) {
+          window.location.href = info.event.url;
+          info.jsEvent.preventDefault();
+        }
+      });
+      calendar.render();
+    });
+  </script>
+</body>
+</html>

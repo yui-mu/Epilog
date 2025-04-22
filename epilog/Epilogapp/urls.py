@@ -18,7 +18,9 @@ from .views import (
     chat_view,
     chat_user_list_view,
     chat_with_user_view,
-    user_skincare_record_list_view
+    user_skincare_record_list_view,
+    user_record_calendar_view,
+    user_record_calendar_events_view
     )
 
 
@@ -45,6 +47,10 @@ urlpatterns = [
     path('chat/users/', chat_user_list_view, name='chat_user_list'),
     path('chat/<int:user_id>/', chat_with_user_view, name='chat_with_user'),
     path('records/user/<int:user_id>/', user_skincare_record_list_view, name='user_skincare_record_list'),
+    path('record/user/<int:user_id>/calendar/', user_record_calendar_view, name='user_record_calendar'),
+    path('record/user/<int:user_id>/events/', user_record_calendar_events_view, name='user_record_calendar_events'),
+
+
 
     
 ]

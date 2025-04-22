@@ -266,6 +266,33 @@ def user_skincare_record_list_view(request, user_id):
         'records': records,
     })
  
+@login_required
+def user_record_calendar_view(request, user_id):
+    if not request.user.is_advisor:
+        return redirect('home')
+
+    target_user = get_object_or_404(CustomUser, id=user_id)
+    return render(request, 'user_record_calendar.html', {
+        'target_user': target_user
+    })
+
+@login_required
+def user_record_calendar_events_view(request, user_id):
+    if not request.user.is_advisor:
+        return JsonResponse([], safe=False)
+
+    target_user = get_object_or_404(CustomUser, id=user_id)
+    records = SkincareRecord.objects.filter(user=target_user)
+
+    events = []
+    for record in records:
+        events.append({
+            "title": "記録あり",
+            "start": str(record.record_date),
+            "url": f"/record/{record.pk}/detail/"
+        })
+
+    return JsonResponse(events, safe=False)
 
 
 
