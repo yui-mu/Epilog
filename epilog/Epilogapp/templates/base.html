@@ -74,16 +74,22 @@
 </head>
 <body>
   {% if user.is_authenticated %}
-    <nav>
-      <a href="{% url 'home' %}">🏠 ホーム</a>
-      <a href="{% url 'record_list' %}">📝 記録一覧</a>
-      <a href="{% url 'product_search' %}">🔍 商品検索</a>
-      <a href="{% url 'favorite_list' %}">❤️ お気に入り</a>
-      <a href="{% url 'chat' %}">💬 チャット</a>
-      <a href="{% url 'logout' %}" style="float:right;">🚪 ログアウト</a>
+    <nav style="display: flex; align-items: center; justify-content: space-between;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-weight: bold; color: #2e5947; font-size: 1.2rem;">EpiLog</span>
+      <a href="{% url 'home' %}">ホーム</a>
+      <a href="{% url 'record_list' %}">記録一覧</a>
+      <a href="{% url 'product_search' %}">商品検索</a>
+      <a href="{% url 'favorite_list' %}">お気に入り</a>
+      <a href="{% url 'chat' %}">チャット</a>  
       {% if user.is_advisor %}
-        <a href="{% url 'chat_user_list' %}">👥 ユーザー一覧</a>
+        <a href="{% url 'chat_user_list' %}">ユーザー一覧</a>
       {% endif %}
+    </div>
+
+    <div>
+      <a href="{% url 'logout' %}">ログアウト</a>
+    </div>  
     </nav>
   {% endif %}
 
