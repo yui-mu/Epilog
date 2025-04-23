@@ -1,26 +1,77 @@
 {% extends 'base.html' %}
-   
 {% block content %}
-    <h1>スキンケア記録一覧</h1>
-    <ul>
-        {% for record in records %}
-            <li>
-                <strong>{{ record.record_date }}</strong><br>
-                 肌の調子：{{ record.get_skin_rating_display }}<br>
-                 肌の状態：{{ record.skin_condition }}<br>
-                 朝のアイテム：{{ record.morning_items }}<br>
-                 夜のアイテム：{{ record.night_items }}<br>
-                 肌悩み：{{ record.concerns }}<br>
-                 成分：{{ record.ingredients }}<br>
-                {% if record.photo %}
-                 <img src="{{ record.photo.url }}" alt="肌の写真" width="150"><br>
-                 {% endif %}
-                  <a href="{% url 'record_edit' record.pk %}">✏️ 編集</a> |
-                  <a href="{% url 'record_delete' record.pk %}">🗑️ 削除</a>
-                 <hr>
-        {% empty %}
-            <li>まだ記録がありません。</li>
-        {% endfor %}
-    </ul>
+
+<h2>スキンケア記録の履歴一覧</h2>
+
+<!-- 並び順選択フォーム -->
+<form method="get" style="text-align: right; margin-bottom: 20px;">
+  <label for="sort">並び順：</label>
+  <select name="sort" id="sort" onchange="this.form.submit()">
+    <option value="desc" {% if request.GET.sort == "desc" or not request.GET.sort %}selected{% endif %}>新しい順</option>
+    <option value="asc" {% if request.GET.sort == "asc" %}selected{% endif %}>古い順</option>
+  </select>
+</form>
+
+<!-- カスタムCSS -->
+<style>
+  .history-container {
+    max-width: 1000px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  .history-card {
+    background-color: white;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    padding: 16px;
+    display: flex;
+    gap: 20px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    align-items: flex-start;
+  }
+
+  .history-image {
+    max-width: 200px;
+    border-radius: 8px;
+  }
+
+  .history-info {
+    flex: 1;
+  }
+</style>
+
+<!-- 記録の表示エリア -->
+<div class="history-container">
+  {% for record in records %}
+    <div class="history-card">
+      {% if record.photo %}
+        <img src="{{ record.photo.url }}" alt="肌の写真" class="history-image">
+      {% endif %}
+      <div class="history-info">
+        <h3>{{ record.record_date }}</h3>
+
+        <p>
+          {% if record.skin_rating == 1 %} 😄 とても良い
+          {% elif record.skin_rating == 2 %} 🙂 良い
+          {% elif record.skin_rating == 3 %} 😐 普通
+          {% elif record.skin_rating == 4 %} 😕 やや悪い
+          {% elif record.skin_rating == 5 %} 😣 悪い
+          {% endif %}
+        </p>
+
+        <p><strong>朝：</strong> {{ record.morning_items }}</p>
+        <p><strong>夜：</strong> {{ record.night_items }}</p>
+
+        <p><a href="{% url 'record_detail' record.pk %}">詳細を見る</a></p>
+      </div>
+    </div>
+  {% endfor %}
+</div>
+
 {% endblock %}
+
+
 

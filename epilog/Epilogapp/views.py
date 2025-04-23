@@ -49,7 +49,9 @@ def record_create_view(request):
 
 @login_required
 def record_list_view(request):
-    records = SkincareRecord.objects.filter(user=request.user).order_by('-record_date')
+    sort = request.GET.get('sort', 'desc')
+    order = '-record_date' if sort == 'desc' else 'record_date'
+    records = SkincareRecord.objects.filter(user=request.user).order_by(order)
     return render(request, 'record_list.html', {'records': records})
 
 @login_required
