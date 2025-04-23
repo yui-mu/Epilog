@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>プロフィール</h1>
+
+<div style="display: flex; justify-content: center; align-items: flex-start; gap: 40px; margin-top: 30px; flex-wrap: wrap;">
+  
+    <!-- 写真とアカウント編集ボタン -->
+    <div style="text-align: center;">
+      {% if user.profile_photo %}
+        <img src="{{ user.profile_photo.url }}" alt="プロフィール画像" style="width: 160px; height: 160px; object-fit: cover; border-radius: 50%;">
+      {% else %}
+        <div style="width: 160px; height: 160px; background-color: #ccc; border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+          No Image
+        </div>
+      {% endif %}
+      
+      <div style="margin-top: 15px;">
+        <a href="{% url 'edit_account' %}" style="display: inline-block; padding: 10px 20px; background-color: #9dd3c5; color: white; text-decoration: none; border-radius: 6px;">
+          アカウントを編集する
+        </a>
+      </div>
+    </div>
+  
+    <!-- 内容とプロフィール編集ボタン -->
+    <div style="max-width: 400px; display: flex; flex-direction: column; align-items: flex-start;">
+      <p><strong>ニックネーム：</strong> {{ user.nickname }}</p>
+      {% if user.age %}
+        <p><strong>年齢：</strong> {{ user.age }}歳</p>
+      {% endif %}
+      {% if user.concerns.exists %}
+        <p><strong>肌悩み：</strong>
+          {{ user.concerns.all|join:", " }}
+        </p>
+      {% else %}
+        <p><strong>肌悩み：</strong> 未設定</p>
+      {% endif %}
+  
+      <div style="margin-top: 15px;">
+        <a href="{% url 'edit_profile' %}" style="display: inline-block; padding: 10px 20px; background-color: #9dd3c5; color: white; text-decoration: none; border-radius: 6px;">
+          プロフィールを編集する
+        </a>
+      </div>
+    </div>
+  
+  </div>
+{% endblock %}
+

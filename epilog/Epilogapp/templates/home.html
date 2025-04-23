@@ -1,8 +1,32 @@
 {% extends 'base.html' %}
 
 {% block content %}
-    <h1>{{ user.nickname }}さん、ようこそ！</h1>
-    <p>こちらはホーム画面です。</p>
-    
+
+<h2 style="text-align: center; margin-top: 20px;">スキンケア記録カレンダー</h2>
+
+<!-- FullCalendarのCSS -->
+<link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
+
+<!-- カレンダー表示エリア -->
+<div id="calendar" style="max-width: 900px; margin: 40px auto;"></div>
+
+<!-- FullCalendarのJS（★順番に注意） -->
+<script src="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/index.global.min.js"></script>
+
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    var calendarEl = document.getElementById("calendar");
+    if (!calendarEl) return;
+
+    var calendar = new FullCalendar.Calendar(calendarEl, {
+      initialView: 'dayGridMonth',
+      locale: 'ja',
+      events: '/record/calendar/events/',
+    });
+
+    calendar.render();
+  });
+</script>
+
 {% endblock %}
 

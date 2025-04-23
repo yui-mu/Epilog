@@ -1,18 +1,22 @@
 from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
-from django.db import models
+
 
 
 
 class CustomUser(AbstractUser):
     nickname = models.CharField("ニックネーム", max_length=64)
     is_advisor = models.BooleanField("アドバイザーかどうか", default=False)
+    age = models.PositiveIntegerField("年齢", null=True, blank=True)  
+    profile_photo = models.ImageField("プロフィール写真", upload_to='profile_photos/', null=True, blank=True)
+    concerns = models.ManyToManyField('Concern', blank=True, verbose_name="肌悩み")  
     created_at = models.DateTimeField("作成日時", auto_now_add=True)
     updated_at = models.DateTimeField("更新日時", auto_now=True)
 
     def __str__(self):
         return self.username
+
     
 class SkincareRecord(models.Model):
     RATING_CHOICES = [

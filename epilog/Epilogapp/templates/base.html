@@ -81,7 +81,8 @@
       <a href="{% url 'record_list' %}">記録一覧</a>
       <a href="{% url 'product_search' %}">商品検索</a>
       <a href="{% url 'favorite_list' %}">お気に入り</a>
-      <a href="{% url 'chat' %}">チャット</a>  
+      <a href="{% url 'chat' %}">相談</a>  
+      <a href="{% url 'profile' %}">プロフィール</a>
       {% if user.is_advisor %}
         <a href="{% url 'chat_user_list' %}">ユーザー一覧</a>
       {% endif %}
@@ -94,9 +95,17 @@
   {% endif %}
 
   <div class="container">
+
+    {% if user.is_authenticated %}
+      <p style="text-align: right; font-size: 0.9em; color: #444; margin: 0 0 10px;">
+        ログイン中：<strong>{{ user.nickname }}</strong> さん
+      </p>
+    {% endif %}
+  
     {% block content %}
-    <!-- 各ページの内容がここに入る -->
+    <!-- 各ページの内容 -->
     {% endblock %}
+  
   </div>
 </body>
 </html>

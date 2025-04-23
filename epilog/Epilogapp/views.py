@@ -3,10 +3,18 @@ from django.contrib.auth.decorators import login_required
 from django.http import JsonResponse, HttpResponseRedirect
 from django.db.models import Q
 from django.utils import timezone
-
-from .forms import CustomUserCreationForm, SkincareRecordForm, ProductForm, ProductSearchForm
+from django.contrib import messages
+from django.contrib.auth import get_user_model
+from .forms import (
+    CustomUserCreationForm, 
+    SkincareRecordForm, 
+    ProductForm, 
+    ProductSearchForm,
+    ProfileForm, 
+    UserEditForm,
+    EditAccountForm
+    )
 from .models import SkincareRecord, Product, Favorite, Message, CustomUser
-
 
 
 def register_view(request):
@@ -294,9 +302,45 @@ def user_record_calendar_events_view(request, user_id):
 
     return JsonResponse(events, safe=False)
 
+@login_required
+def profile_view(request):
+    user = request.user
+    return render(request, 'profile.html', {'user': user})
 
+@login_required
+def edit_profile_view(request):
+    user = request.user
+    if request.method == 'POST':
+        profile_form = ProfileForm(request.POST, request.FILES, instance=user)
+        account_form = UserEditForm(request.POST, instance=user)
+        if profile_form.is_valid() and account_form.is_valid():
+            profile_form.save()
+            account_form.save()
+            messages.success(request, 'プロフィールを更新しました。')
+            return redirect('profile')
+    else:
+        profile_form = ProfileForm(instance=user)
+        account_form = UserEditForm(instance=user)
 
+    return render(request, 'edit_profile.html', {
+        'profile_form': profile_form,
+        'account_form': account_form,
+    })
 
+User = get_user_model()
 
+@login_required
+def edit_account_view(request):
+    user = request.user
+    if request.method == 'POST':
+        form = EditAccountForm(request.POST, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'アカウント情報を更新しました。')
+            return redirect('profile')  # プロフィール画面に戻る
+    else:
+        form = EditAccountForm(instance=user)
+
+    return render(request, 'edit_account.html', {'form': form})
 
 
