@@ -5,9 +5,9 @@
     <title>商品登録</title>
 </head>
 <body>
-    <h1>🧴 商品登録フォーム</h1>
+    <h1>商品登録フォーム</h1>
 
-    <form method="post">
+    <form method="post" enctype="multipart/form-data">
         {% csrf_token %}
         {{ form.as_p }}
         <button type="submit">登録する</button>

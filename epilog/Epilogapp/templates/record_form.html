@@ -1,13 +1,137 @@
 {% extends 'base.html' %}
-   
 {% block content %}
-    <h1>スキンケア記録フォーム</h1>
 
-    <form method="post" enctype="multipart/form-data">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">記録する</button>
-    </form>
+<h1>スキンケア記録フォーム</h1>
 
-    <p><a href="{% url 'home' %}">← ホームに戻る</a></p>
+<form method="post" enctype="multipart/form-data">
+  {% csrf_token %}
+
+  <!-- 日付 -->
+  <p>
+    {{ form.record_date.label_tag }}<br>
+    {{ form.record_date }}
+  </p>
+
+  <!-- 肌の評価（顔アイコン付きラジオボタン） -->
+  <div class="form-group">
+    <strong>{{ form.skin_rating.label }}</strong><br>
+    {% for choice in form.skin_rating %}
+      <label style="display: inline-block; margin-right: 12px;">
+        {{ choice.tag }}
+        {% if choice.choice_label == "とても良い" %}
+          😄 とても良い
+        {% elif choice.choice_label == "良い" %}
+          🙂 良い
+        {% elif choice.choice_label == "普通" %}
+          😐 普通
+        {% elif choice.choice_label == "やや悪い" %}
+          😕 やや悪い
+        {% elif choice.choice_label == "悪い" %}
+          😣 悪い
+        {% else %}
+          {{ choice.choice_label }}
+        {% endif %}
+      </label>
+    {% endfor %}
+  </div>
+
+  <!-- 肌の状態メモ -->
+  <p>
+    {{ form.skin_condition.label_tag }}<br>
+    {{ form.skin_condition }}
+  </p>
+
+  <!-- 肌の写真 -->
+  <p>
+    {{ form.photo.label_tag }}<br>
+    {{ form.photo }}
+  </p>
+
+  <!-- 使用アイテムのセクション -->
+<div style="margin-top: 30px;">
+    <h3 style="border-bottom: 2px solid #a7d7c5; color: #2e5947;">使用したスキンケアアイテム</h3>
+  
+    <!-- 朝アイテム -->
+{% with morning_list as ml %}
+<div style="border: 1px solid #a7d7c5; padding: 16px; border-radius: 12px; margin-top: 20px; background-color: #f5f9f6;">
+  <strong>🌞 朝に使ったアイテム（使用順）</strong><br><br>
+  {% for i in "123456" %}
+  <div style="margin-bottom: 12px;">
+    <label>{{ forloop.counter }}番目：</label><br>
+
+    <input type="text" class="morning-input-name"
+           placeholder="商品名"
+           style="margin-bottom: 4px; width: 80%;"><br>
+
+    <input type="text" class="morning-input-ingredient"
+           placeholder="成分名（任意）"
+           style="width: 80%;">
+  </div>
+  {% endfor %}
+  {{ form.morning_items }}
+</div>
+{% endwith %}
+
+<!-- 夜アイテム -->
+{% with night_list as nl %}
+<div style="border: 1px solid #a7d7c5; padding: 16px; border-radius: 12px; margin-top: 20px; background-color: #f5f9f6;">
+  <strong>🌙 夜に使ったアイテム（使用順）</strong><br><br>
+  {% for i in "123456" %}
+    <div style="margin-bottom: 12px;">
+      <label>{{ forloop.counter }}番目：</label><br>
+
+      <input type="text" class="night-input-name"
+             placeholder="商品名"
+             style="margin-bottom: 4px; width: 80%;"><br>
+
+      <input type="text" class="night-input-ingredient"
+             placeholder="成分名（任意）"
+             style="width: 80%;">
+    </div>
+  {% endfor %}
+  {{ form.night_items }}
+</div>
+{% endwith %}
+
+  <!-- 肌の悩み -->
+  <p>
+    {{ form.concerns.label_tag }}<br>
+    {{ form.concerns }}
+  </p>
+
+  <!-- 気になる成分 -->
+  <p>
+    {{ form.ingredients.label_tag }}<br>
+    {{ form.ingredients }}
+  </p>
+
+  <button type="submit">記録する</button>
+</form>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function () {
+      function updateInputs(inputClass, targetId) {
+        const values = Array.from(document.querySelectorAll('.' + inputClass))
+                            .map(input => input.value.trim())
+                            .filter(v => v);
+        document.getElementById(targetId).value = values.join(', ');
+      }
+  
+      // 朝
+      document.querySelectorAll('.morning-input-name').forEach(input => {
+        input.addEventListener('input', () =>
+          updateInputs('morning-input-name', '{{ form.morning_items.id_for_label }}')
+        );
+      });
+  
+      // 夜
+      document.querySelectorAll('.night-input-name').forEach(input => {
+        input.addEventListener('input', () =>
+          updateInputs('night-input-name', '{{ form.night_items.id_for_label }}')
+        );
+      });
+    });
+  </script>
+<p><a href="{% url 'home' %}">← ホームに戻る</a></p>
+
 {% endblock %}

@@ -27,7 +27,7 @@ class SkincareRecordForm(forms.ModelForm):
 
         widgets = {
             'record_date': forms.DateInput(attrs={'type': 'date'}),
-            'skin_rating': forms.Select(),
+            'skin_rating': forms.RadioSelect(),
             'skin_condition': forms.Textarea(attrs={'rows': 3}),
             'morning_items': forms.Textarea(attrs={'rows': 2}),
             'night_items': forms.Textarea(attrs={'rows': 2}),
@@ -38,7 +38,7 @@ class SkincareRecordForm(forms.ModelForm):
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
-        fields = ['name', 'brand', 'category', 'ingredients', 'concerns']
+        fields = ['name', 'brand', 'category', 'image', 'ingredients', 'concerns']
         widgets = {
             'ingredients': forms.CheckboxSelectMultiple,
             'concerns': forms.CheckboxSelectMultiple,
@@ -47,7 +47,11 @@ class ProductForm(forms.ModelForm):
 class ProductSearchForm(forms.Form):
     name = forms.CharField(label='商品名', required=False)
     brand = forms.CharField(label='ブランド名', required=False)
-    category = forms.CharField(label='カテゴリ', required=False)
+    category = forms.ChoiceField(
+        label='カテゴリ',
+        choices=[('', '---')] + Product.CATEGORY_CHOICES,
+        required=False
+    )
     ingredients = forms.ModelMultipleChoiceField(
         label='配合成分',
         queryset=Ingredient.objects.all(),

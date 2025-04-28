@@ -4,6 +4,37 @@
 
 <h2 style="text-align: center; margin-top: 20px;">スキンケア記録カレンダー</h2>
 
+<style>
+  .recorded-day-fullclick {
+    background-color: #b7e8cf !important;
+    border-radius: 6px;
+  }
+
+  .fc-day-today {
+    background-color: #d0ebe7 !important;
+    border: 2px solid #64b6ac;
+  }
+
+  .fc-daygrid-day:hover {
+    background-color: #e0f7f3 !important;
+    cursor: pointer;
+  }
+
+  /* イベントタイトルは今度は表示させたいので削除 */
+  /* .fc-event-title { display: none; } ← これは消す */
+
+  /* 横棒スタイルを少し調整（自然に） */
+  .fc-event {
+    font-size: 0.75rem;
+    padding: 2px 4px;
+    background-color: #64b6ac !important;
+    color: white !important;
+    border-radius: 4px;
+    text-align: center;
+    border: none !important;
+  }
+</style>
+
 <!-- FullCalendarのCSS -->
 <link href="https://cdn.jsdelivr.net/npm/fullcalendar@6.1.8/main.min.css" rel="stylesheet" />
 
@@ -18,12 +49,48 @@
     var calendarEl = document.getElementById("calendar");
     if (!calendarEl) return;
 
+    var recordedDates = new Set(); // ← クリック無効化用の日付一覧を後でここに入れる
+
     var calendar = new FullCalendar.Calendar(calendarEl, {
       initialView: 'dayGridMonth',
       locale: 'ja',
-      events: '/record/calendar/events/',
+      events: function(fetchInfo, successCallback, failureCallback) {
+        fetch('/record/calendar/events/')
+          .then(response => response.json())
+          .then(events => {
+            // 記録ありの日付を記録（Setに入れる）
+            events.forEach(event => {
+              if (event.start) {
+                recordedDates.add(event.start);
+              }
+            });
+            successCallback(events);
+          })
+          .catch(failureCallback);
+      },
+      dateClick: function(info) {
+        if (recordedDates.has(info.dateStr)) {
+          return;
+        }
+        window.location.href = '/record/create/?date=' + info.dateStr;
+      },
+      eventClick: function(info) {
+        if (info.event.url) {
+          window.location.href = info.event.url;
+          info.jsEvent.preventDefault();
+        }
+      },
+      eventDidMount: function(info) {
+        const dateStr = info.event.startStr;
+        const cell = document.querySelector(`[data-date="${dateStr}"]`);
+        if (cell && info.event.url) {
+          cell.style.cursor = "pointer";
+          cell.onclick = function() {
+            window.location.href = info.event.url;
+          };
+        }
+      }
     });
-
     calendar.render();
   });
 </script>

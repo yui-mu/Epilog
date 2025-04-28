@@ -10,15 +10,18 @@
 
     <hr>
 
-    <h2>📦 検索結果</h2>
+    <h2>検索結果</h2>
     {% if products %}
     <ul>
     {% for product in products %}
-        <li>
+        <li style="margin-bottom: 30px;">
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width: 150px; height: auto;"><br>
+            {% endif %}
             <strong>{{ product.name }}</strong><br>
             ブランド: {{ product.brand }}<br>
-            カテゴリ: {{ product.category }}<br>
-
+            カテゴリ: {{ product.get_category_display }}<br>
+        
             <form method="post" action="{% url 'add_favorite' product.id %}">
                 {% csrf_token %}
                 <button type="submit">❤️ お気に入りに追加</button>

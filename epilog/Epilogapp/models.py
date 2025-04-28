@@ -58,9 +58,19 @@ class Concern(models.Model):
 
 # 商品モデル
 class Product(models.Model):
+    CATEGORY_CHOICES = [
+        ('化粧水', '化粧水'),
+        ('乳液', '乳液'),
+        ('美容液', '美容液'),
+        ('クリーム', 'クリーム'),
+        # 必要に応じてさらに追加
+    ]
+
     name = models.CharField("商品名", max_length=200)
     brand = models.CharField("ブランド名", max_length=100)
-    category = models.CharField("カテゴリ", max_length=100)
+    category = models.CharField("カテゴリ", max_length=100, choices=CATEGORY_CHOICES)
+    
+    image = models.ImageField("商品画像", upload_to='photos/', blank=True, null=True)
 
     ingredients = models.ManyToManyField(Ingredient, blank=True, verbose_name="配合成分")
     concerns = models.ManyToManyField(Concern, blank=True, verbose_name="対応する肌悩み")

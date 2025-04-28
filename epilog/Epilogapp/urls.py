@@ -8,13 +8,14 @@ from django.contrib.auth.views import (
     PasswordResetConfirmView,
     PasswordResetCompleteView,       
 )
+from . import views
 from .views import (
     register_view, 
     home_view, top_view, 
     record_create_view, 
     record_list_view, 
     record_edit_view,
-    record_delete_view,
+    record_detail_view,
     calendar_view,
     calendar_events_view,
     record_detail_view,
@@ -46,10 +47,11 @@ urlpatterns = [
     path('record/create/', record_create_view, name='record_create'),
     path('record/list/', record_list_view, name='record_list'),
     path('record/edit/<int:pk>/', record_edit_view, name='record_edit'),
-    path('record/delete/<int:pk>/', record_delete_view, name='record_delete'),
+    path('record/delete/<int:pk>/', record_detail_view, name='record_delete'),
     path('record/calendar/', calendar_view, name='record_calendar'),
     path('record/calendar/events/', calendar_events_view, name='calendar_events'),
     path('record/<int:pk>/detail/', record_detail_view, name='record_detail'),
+    path('record/<int:pk>/edit/', views.record_edit_view, name='record_edit'),
     path('product/create/', product_create_view, name='product_create'),
     path('product/search/', product_search_view, name='product_search'),
     path('favorite/add/<int:product_id>/', add_favorite_view, name='add_favorite'),

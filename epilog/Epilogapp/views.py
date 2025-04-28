@@ -5,6 +5,7 @@ from django.db.models import Q
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from collections import Counter
 from .forms import (
     CustomUserCreationForm, 
     SkincareRecordForm, 
@@ -36,16 +37,50 @@ def top_view(request):
 
 @login_required
 def record_create_view(request):
+    initial_date = request.GET.get('date')
+
+    # ユーザーの過去記録から朝・夜アイテムのテキストを集める
+    records = SkincareRecord.objects.filter(user=request.user)
+    used_names = []
+
+    for record in records:
+        if record.morning_items:
+            used_names.extend(record.morning_items.split(','))
+        if record.night_items:
+            used_names.extend(record.night_items.split(','))
+
+    # よく使われた商品名を集計
+    cleaned = [name.strip() for name in used_names if name.strip()]
+    most_common = [name for name, count in Counter(cleaned).most_common(10)]
+
+    # 一致する商品オブジェクトを取得
+    products = Product.objects.filter(name__in=most_common)
+
+    if not products.exists():  # fallback
+        products = Product.objects.all()
+
+    # フォーム処理
     if request.method == 'POST':
         form = SkincareRecordForm(request.POST, request.FILES)
         if form.is_valid():
             record = form.save(commit=False)
-            record.user = request.user  # ログインユーザーを紐付け
+            record.user = request.user
             record.save()
-            return redirect('home')  # 登録後にホームへ戻る
+            return redirect('home')
     else:
-        form = SkincareRecordForm()
-    return render(request, 'record_form.html', {'form': form})
+        form = SkincareRecordForm(initial={'record_date': initial_date})
+
+        morning_text = form.initial.get('morning_items') or ''
+        night_text = form.initial.get('night_items') or ''
+
+        morning_list = [s.strip() for s in morning_text.split(',') if s.strip()] if morning_text else []
+        night_list = [s.strip() for s in night_text.split(',') if s.strip()] if night_text else []
+    return render(request, 'record_form.html', {
+    'form': form,
+    'products': products,
+    'morning_list': morning_list,
+    'night_list': night_list,
+})
 
 @login_required
 def record_list_view(request):
@@ -68,13 +103,7 @@ def record_edit_view(request, pk):
 
     return render(request, 'record_form.html', {'form': form})
 
-@login_required
-def record_delete_view(request, pk):
-    record = get_object_or_404(SkincareRecord, pk=pk, user=request.user)
-    if request.method == 'POST':
-        record.delete()
-        return redirect('record_list')  # 削除後に一覧に戻る
-    return render(request, 'record_confirm_delete.html', {'record': record})
+                   
 
 @login_required
 def calendar_view(request):
@@ -87,22 +116,32 @@ def calendar_events_view(request):
 
     for record in records:
         events.append({
-            "title": "記録あり",
-            "start": str(record.record_date),
-            "url": f"/record/{record.pk}/detail/"
-        })
+    "title": "記録あり",  # ← 文字をちゃんと表示
+    "start": str(record.record_date),
+    "url": f"/record/{record.pk}/detail/",
+    "className": "recorded-day-fullclick"
+})
 
     return JsonResponse(events, safe=False)
-
+   
 @login_required
 def record_detail_view(request, pk):
     record = get_object_or_404(SkincareRecord, pk=pk, user=request.user)
-    return render(request, 'record_detail.html', {'record': record})
+
+    # 朝・夜のアイテムをリストに変換
+    morning_list = [s.strip() for s in (record.morning_items or "").split(',') if s.strip()]
+    night_list = [s.strip() for s in (record.night_items or "").split(',') if s.strip()]
+
+    return render(request, 'record_detail.html', {
+        'record': record,
+        'morning_list': morning_list,
+        'night_list': night_list,
+    })
 
 @login_required
 def product_create_view(request):
     if request.method == 'POST':
-        form = ProductForm(request.POST)
+        form = ProductForm(request.POST, request.FILES)
         if form.is_valid():
             form.save()
             return redirect('home')
@@ -113,9 +152,9 @@ def product_create_view(request):
 @login_required
 def product_search_view(request):
     form = ProductSearchForm(request.GET or None)
-    products = Product.objects.none()  # 初期は空にする
+    products = Product.objects.none()
 
-    if form.is_valid() and request.GET:  # ← GETデータがあるときだけ実行！
+    if form.is_valid() and request.GET:
         name = form.cleaned_data.get('name')
         brand = form.cleaned_data.get('brand')
         category = form.cleaned_data.get('category')
@@ -129,7 +168,7 @@ def product_search_view(request):
         if brand:
             products = products.filter(brand__icontains=brand)
         if category:
-            products = products.filter(category__icontains=category)
+            products = products.filter(category=category)  # ←ここだけ修正！
         if ingredients:
             products = products.filter(ingredients__in=ingredients).distinct()
         if concerns:
