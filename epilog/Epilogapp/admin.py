@@ -1,5 +1,5 @@
 from django.contrib import admin
-from .models import Product, Ingredient, Concern, Favorite, Message
+from .models import Product, Ingredient, Concern, Favorite, Message, SkinType
 from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser
 
@@ -12,6 +12,7 @@ class CustomUserAdmin(UserAdmin):
 admin.site.register(Product)
 admin.site.register(Ingredient)
 admin.site.register(Concern)
+admin.site.register(SkinType)
 admin.site.register(Favorite) 
 admin.site.register(Message)
 admin.site.register(CustomUser, CustomUserAdmin)

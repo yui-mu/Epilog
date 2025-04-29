@@ -152,32 +152,39 @@ def product_create_view(request):
 @login_required
 def product_search_view(request):
     form = ProductSearchForm(request.GET or None)
-    products = Product.objects.none()
+    products = Product.objects.all()
 
     if form.is_valid() and request.GET:
-        name = form.cleaned_data.get('name')
-        brand = form.cleaned_data.get('brand')
+        keyword = form.cleaned_data.get('keyword')
         category = form.cleaned_data.get('category')
-        ingredients = form.cleaned_data.get('ingredients')
-        concerns = form.cleaned_data.get('concerns')
+        concern = form.cleaned_data.get('concern')
+        skin_type = form.cleaned_data.get('skin_type')
+        feature = form.cleaned_data.get('feature')
 
-        products = Product.objects.all()
+        if keyword:
+            products = products.filter(
+                Q(name__icontains=keyword) |
+                Q(brand__icontains=keyword) |
+                Q(ingredients__name__icontains=keyword)
+            ).distinct()
 
-        if name:
-            products = products.filter(name__icontains=name)
-        if brand:
-            products = products.filter(brand__icontains=brand)
         if category:
-            products = products.filter(category=category)  # ←ここだけ修正！
-        if ingredients:
-            products = products.filter(ingredients__in=ingredients).distinct()
-        if concerns:
-            products = products.filter(concerns__in=concerns).distinct()
+            products = products.filter(category=category)
+
+        if concern:
+            products = products.filter(concerns=concern)
+
+        if skin_type:
+            products = products.filter(skin_types=skin_type)
+
+        if feature:
+            products = products.filter(features__name__icontains=feature).distinct()
 
     return render(request, 'product_search.html', {
         'form': form,
         'products': products,
     })
+
 
 @login_required
 def add_favorite_view(request, product_id):

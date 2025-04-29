@@ -59,10 +59,13 @@ class Concern(models.Model):
 # 商品モデル
 class Product(models.Model):
     CATEGORY_CHOICES = [
+        ('クレンジング', 'クレンジング'),
+        ('洗顔', '洗顔'),
         ('化粧水', '化粧水'),
         ('乳液', '乳液'),
         ('美容液', '美容液'),
         ('クリーム', 'クリーム'),
+        
         # 必要に応じてさらに追加
     ]
 
@@ -79,6 +82,12 @@ class Product(models.Model):
 
     def __str__(self):
         return f"{self.name}（{self.brand}）"
+    
+class SkinType(models.Model):
+    name = models.CharField(max_length=100)
+
+    def __str__(self):
+        return self.name
     
 class Favorite(models.Model):
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

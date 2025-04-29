@@ -4,8 +4,8 @@ from django.contrib.auth.forms import UserChangeForm
 from django.contrib.auth import get_user_model
 from .models import CustomUser
 from .models import SkincareRecord
-from .models import Product
-from .models import Ingredient, Concern
+from .models import Product, Concern, SkinType
+from .models import Ingredient
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
@@ -45,26 +45,32 @@ class ProductForm(forms.ModelForm):
         }
         
 class ProductSearchForm(forms.Form):
-    name = forms.CharField(label='商品名', required=False)
-    brand = forms.CharField(label='ブランド名', required=False)
+    keyword = forms.CharField(
+        label='キーワード（商品名・ブランド名・成分名）',
+        required=False
+    )
     category = forms.ChoiceField(
         label='カテゴリ',
         choices=[('', '---')] + Product.CATEGORY_CHOICES,
         required=False
     )
-    ingredients = forms.ModelMultipleChoiceField(
-        label='配合成分',
-        queryset=Ingredient.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
-        required=False
-    )
-    concerns = forms.ModelMultipleChoiceField(
-        label='対応する肌悩み',
+    concern = forms.ModelChoiceField(
+        label='悩み・効果',
         queryset=Concern.objects.all(),
-        widget=forms.CheckboxSelectMultiple,
+        empty_label='---',
         required=False
     )
-
+    skin_type = forms.ModelChoiceField(
+        label='肌質',
+        queryset=SkinType.objects.all(),
+        empty_label='---',
+        required=False
+    )
+    feature = forms.CharField(
+        label='成分の特徴（例：保湿、低刺激など）',
+        required=False
+    )
+    
 class ProfileForm(forms.ModelForm):
     class Meta:
         model = CustomUser

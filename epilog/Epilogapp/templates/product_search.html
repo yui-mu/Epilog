@@ -1,39 +1,222 @@
 
 {% extends 'base.html' %}
+
 {% block content %}
-    <h1>🔍 商品検索</h1>
+<style>
+  .search-area {
+    max-width: 700px;
+    margin: 0 auto;
+    padding: 20px;
+  }
 
-    <form method="get">
-        {{ form.as_p }}
-        <button type="submit">検索する</button>
-    </form>
+  .keyword-box {
+    display: flex;
+    justify-content: center;
+  }
 
-    <hr>
+  form {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    background-color: #fefefe;
+    border-radius: 10px;
+    padding: 20px;
+  }
 
-    <h2>検索結果</h2>
-    {% if products %}
-    <ul>
+  fieldset {
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    padding: 15px;
+    background-color: #f9f9f9;
+  }
+
+  legend {
+    font-weight: bold;
+    font-size: 18px;
+    text-align: center;
+  }
+
+  /* 横並びタブ */
+  .filter-tabs {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 15px;
+    justify-content: center;
+  }
+
+  .tab-box {
+    flex: 1 1 22%;
+    min-width: 120px;
+    max-width: 180px;
+  }
+  
+
+  .tab-button {
+    width: 100%;
+    padding: 10px;
+    background-color: #b2dfdb;
+    color: #000;
+    font-weight: bold;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    text-align: center;
+  }
+
+  .filter-content {
+    width: 100%;
+    margin-top: 8px;
+  }
+
+  .filter-content select,
+  .filter-content input {
+    width: 100%;
+    padding: 6px;
+    font-size: 14px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    box-sizing: border-box;
+  }
+
+  .selected-filters {
+    text-align: center;
+    padding: 10px;
+    background-color: #f1f1f1;
+    border-radius: 8px;
+  }
+
+  .selected-filters ul {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 10px;
+  }
+
+  .selected-filters li {
+    background-color: #6cb4ff;
+    color: white;
+    padding: 5px 10px;
+    border-radius: 20px;
+    font-size: 13px;
+  }
+
+  .product-grid {
+    list-style: none;
+    padding: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+  }
+
+  .product-card {
+    max-width: 300px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-card img {
+    max-width: 100%;
+    max-height: 250px;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+</style>
+
+
+
+<div class="search-area">
+  <h1 class="page-title">商品検索</h1>
+
+  <form method="get">
+    <fieldset>
+      <legend>キーワード検索</legend>
+      <div class="keyword-box">
+        {{ form.keyword }}
+      </div>
+    </fieldset>
+
+    <div class="filter-tabs">
+      <!-- カテゴリ -->
+      <div class="tab-box">
+        <button type="button" class="tab-button">カテゴリ</button>
+        <div class="filter-content">
+          <select name="category" onchange="updateSelectedFilters()">
+            {% for value, label in form.category.field.choices %}
+              <option value="{{ value }}" {% if form.category.value == value|stringformat:"s" %}selected{% endif %}>{{ label }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- 悩み -->
+      <div class="tab-box">
+        <button type="button" class="tab-button">悩み・効果</button>
+        <div class="filter-content">
+          <select name="concern" onchange="updateSelectedFilters()">
+            <option value="">---</option>
+            {% for option in form.fields.concern.queryset %}
+              <option value="{{ option.id }}" {% if form.data.concern == option.id|stringformat:"s" %}selected{% endif %}>{{ option.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- 肌質 -->
+      <div class="tab-box">
+        <button type="button" class="tab-button">肌質</button>
+        <div class="filter-content">
+          <select name="skin_type" onchange="updateSelectedFilters()">
+            <option value="">---</option>
+            {% for option in form.fields.skin_type.queryset %}
+              <option value="{{ option.id }}" {% if form.data.skin_type == option.id|stringformat:"s" %}selected{% endif %}>{{ option.name }}</option>
+            {% endfor %}
+          </select>
+        </div>
+      </div>
+
+      <!-- 成分 -->
+      <div class="tab-box">
+        <button type="button" class="tab-button">成分の特徴</button>
+        <div class="filter-content">
+          <input type="text" name="feature" placeholder="成分を入力" value="{{ form.data.feature }}" onchange="updateSelectedFilters()">
+        </div>
+      </div>
+    </div>
+    
+    <button type="submit">検索する</button>
+  </form>
+</div>
+
+<hr>
+
+<h2>検索結果</h2>
+
+{% if products %}
+  <ul class="product-grid">
     {% for product in products %}
-        <li style="margin-bottom: 30px;">
-            {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="max-width: 150px; height: auto;"><br>
-            {% endif %}
-            <strong>{{ product.name }}</strong><br>
-            ブランド: {{ product.brand }}<br>
-            カテゴリ: {{ product.get_category_display }}<br>
-        
-            <form method="post" action="{% url 'add_favorite' product.id %}">
-                {% csrf_token %}
-                <button type="submit">❤️ お気に入りに追加</button>
-            </form>
-        </li>
+      <li class="product-card">
+        {% if product.image %}
+          <img src="{{ product.image.url }}" alt="{{ product.name }}">
+        {% endif %}
+        <h3>{{ product.name }}</h3>
+        <p>ブランド: {{ product.brand }}</p>
+        <p>カテゴリ: {{ product.get_category_display }}</p>
+        <form method="post" action="{% url 'add_favorite' product.id %}">
+          {% csrf_token %}
+          <button type="submit">❤️ お気に入りに追加</button>
+        </form>
+      </li>
     {% endfor %}
-    </ul>
-    {% else %}
-        <p>該当する商品はありませんでした。</p>
-    {% endif %}
+  </ul>
+{% else %}
+  <p>該当する商品はありませんでした。</p>
+{% endif %}
 {% endblock %}
-
-   
-
 
