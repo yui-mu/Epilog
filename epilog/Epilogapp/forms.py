@@ -30,13 +30,6 @@ SKIN_RATING_CHOICES = [
 ]
 
 class SkincareRecordForm(forms.ModelForm):
-    skin_rating = forms.ChoiceField(
-        choices=SKIN_RATING_CHOICES,
-        widget=forms.RadioSelect,
-        required=True,
-        label='肌の調子'
-    )
-
     concerns = forms.MultipleChoiceField(
         choices=SKIN_CONCERN_CHOICES,
         widget=forms.CheckboxSelectMultiple,
@@ -50,8 +43,6 @@ class SkincareRecordForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
-        # ✅ cleaned_data から skin_rating をモデルに渡す（これがないと空になる）
-        instance.skin_rating = self.cleaned_data['skin_rating']
         if commit:
             instance.save()
             self.save_m2m()
@@ -64,6 +55,10 @@ class SkincareRecordForm(forms.ModelForm):
             'morning_items', 'night_items',
             'skin_rating', 'concerns'
         ]
+        widgets = {
+            'skin_rating': forms.RadioSelect,  # ← ここでラジオボタンにする
+        }
+
 
 
 class ProductForm(forms.ModelForm):

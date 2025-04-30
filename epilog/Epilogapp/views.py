@@ -88,11 +88,15 @@ def record_create_view(request):
     # フォーム処理
     if request.method == 'POST':
         form = SkincareRecordForm(request.POST, request.FILES)
+        print("POSTで送られたデータ:", request.POST)
+        
         if form.is_valid():
             record = form.save(commit=False)
             record.user = request.user
             record.save()
             return render(request, 'record_complete.html')
+        else:
+            print("フォームのエラー:", form.errors)
     else:
         date_str = request.GET.get('date')
         try:
