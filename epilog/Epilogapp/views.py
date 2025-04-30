@@ -1,10 +1,12 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
+from django.views.decorators.http import require_POST
 from django.http import JsonResponse, HttpResponseRedirect
 from django.db.models import Q
 from django.utils import timezone
 from django.contrib import messages
 from django.contrib.auth import get_user_model
+from django.contrib.auth import authenticate, login
 from collections import Counter
 from .forms import (
     CustomUserCreationForm, 
@@ -13,7 +15,8 @@ from .forms import (
     ProductSearchForm,
     ProfileForm, 
     UserEditForm,
-    EditAccountForm
+    EditAccountForm,
+    EmailLoginForm
     )
 from .models import SkincareRecord, Product, Favorite, Message, CustomUser
 
@@ -23,10 +26,30 @@ def register_view(request):
         form = CustomUserCreationForm(request.POST)
         if form.is_valid():
             form.save()
-            return redirect('login')  # 登録後にログインページへ
+            return redirect('login')
+        else:
+            # バリデーションに失敗したときも、formをそのまま渡して再表示
+            return render(request, 'register.html', {'form': form})
     else:
         form = CustomUserCreationForm()
     return render(request, 'register.html', {'form': form})
+
+def email_login_view(request):
+    if request.method == 'POST':
+        form = EmailLoginForm(request.POST)
+        if form.is_valid():
+            email = form.cleaned_data['email']
+            password = form.cleaned_data['password']
+            user = authenticate(request, email=email, password=password)
+            if user is not None:
+                login(request, user)
+                return redirect('home')  # ログイン後に表示したいページ
+            else:
+                form.add_error(None, 'メールアドレスまたはパスワードが正しくありません。')
+    else:
+        form = EmailLoginForm()
+    return render(request, 'registration/login.html', {'form': form})
+
 
 @login_required
 def home_view(request):
@@ -38,6 +61,9 @@ def top_view(request):
 @login_required
 def record_create_view(request):
     initial_date = request.GET.get('date')
+    
+    morning_list = []
+    night_list = []
 
     # ユーザーの過去記録から朝・夜アイテムのテキストを集める
     records = SkincareRecord.objects.filter(user=request.user)
@@ -66,12 +92,18 @@ def record_create_view(request):
             record = form.save(commit=False)
             record.user = request.user
             record.save()
-            return redirect('home')
+            return render(request, 'record_complete.html')
     else:
+        date_str = request.GET.get('date')
+        try:
+            initial_date = timezone.datetime.strptime(date_str, '%Y-%m-%d').date()
+        except (TypeError, ValueError):
+            initial_date = timezone.now().date()
+        
         form = SkincareRecordForm(initial={'record_date': initial_date})
 
-        morning_text = form.initial.get('morning_items') or ''
-        night_text = form.initial.get('night_items') or ''
+        morning_text = request.POST.get('morning_items', '')
+        night_text = request.POST.get('night_items', '')
 
         morning_list = [s.strip() for s in morning_text.split(',') if s.strip()] if morning_text else []
         night_list = [s.strip() for s in night_text.split(',') if s.strip()] if night_text else []
@@ -179,31 +211,26 @@ def product_search_view(request):
 
         if feature:
             products = products.filter(features__name__icontains=feature).distinct()
+            
+    favorite_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
 
     return render(request, 'product_search.html', {
         'form': form,
         'products': products,
+        'favorite_ids': list(favorite_ids),
     })
 
 
 @login_required
-def add_favorite_view(request, product_id):
-    product = get_object_or_404(Product, id=product_id)
-
-    favorite, created = Favorite.objects.get_or_create(user=request.user, product=product)
-
-    if created:
-        message = "お気に入りに追加しました！"
-    else:
-        message = "すでにお気に入りに登録されています。"
-
-    # ホームや検索結果ページにリダイレクト
-    return redirect('product_search')
-
-@login_required
 def favorite_list_view(request):
     favorites = Favorite.objects.filter(user=request.user).select_related('product')
-    return render(request, 'favorite_list.html', {'favorites': favorites})
+    return render(request, 'app/favorite_list.html', {'favorites': favorites})
+
+@login_required
+def add_favorite_view(request, product_id):
+    product = get_object_or_404(Product, id=product_id)
+    Favorite.objects.get_or_create(user=request.user, product=product)
+    return redirect('product_search')
 
 @login_required
 def remove_favorite_view(request, product_id):
@@ -391,4 +418,23 @@ def edit_account_view(request):
 
     return render(request, 'edit_account.html', {'form': form})
 
+from django.views.decorators.http import require_POST
+from django.http import JsonResponse
 
+@require_POST
+@login_required
+def toggle_favorite_ajax(request):
+    product_id = request.POST.get('product_id')
+    if not product_id:
+        return JsonResponse({'success': False}, status=400)
+
+    product = get_object_or_404(Product, id=product_id)
+    favorite, created = Favorite.objects.get_or_create(user=request.user, product=product)
+
+    if not created:
+        # すでにお気に入り→削除する
+        favorite.delete()
+        return JsonResponse({'success': True, 'status': 'removed'})
+    else:
+        # 新規追加された
+        return JsonResponse({'success': True, 'status': 'added'})

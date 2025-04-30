@@ -1,15 +1,137 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>ユーザー登録</title>
-</head>
-<body>
-    <h1>ユーザー登録</h1>
+{% extends "base.html" %}
+
+{% block content %}
+<style>
+  .register-wrapper {
+    display: flex;
+    justify-content: center;
+    padding: 60px 0;
+    background-color: #f5faf7;
+    min-height: 100vh;
+  }
+
+  .register-box {
+    background-color: #ffffff;
+    padding: 40px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    width: 480px;
+  }
+
+  .register-box h2 {
+    text-align: center;
+    margin-bottom: 20px;
+  }
+
+  .form-section {
+    padding-bottom: 12px;
+    margin-bottom: 16px;
+    border-bottom: 1px solid #ddd;
+  }
+
+  .register-box label {
+    display: block;
+    font-weight: bold;
+    margin-bottom: 4px;
+  }
+
+  .register-box input {
+    width: 100%;
+    padding: 8px;
+    height: 40px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    display: block;
+    visibility: visible;
+    box-sizing: border-box;
+    font-size: 16px;
+    background-color: #fff;
+  }
+  
+  
+  .register-box button {
+    width: 100%;
+    padding: 10px;
+    background-color: #a3d9c9;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+  }
+
+  .register-box button:hover {
+    background-color: #7cc7b3;
+  }
+
+  .errorlist {
+    color: red;
+    font-size: 0.9em;
+    margin-top: 4px;
+    margin-bottom: 12px;
+    padding-left: 0;
+    list-style: none;
+  }
+  
+</style>
+
+<div class="register-wrapper">
+  <div class="register-box">
+    <h2>アカウント登録</h2>
     <form method="post">
-        {% csrf_token %}
-        {{ form.as_p }}
-        <button type="submit">登録</button>
+      {% csrf_token %}
+
+      <div class="form-section">
+        {{ form.username.label_tag }}
+        {{ form.username }}
+        {{ form.username.errors }}
+      </div>
+
+      <div class="form-section">
+        {{ form.nickname.label_tag }}
+        {{ form.nickname }}
+        {{ form.nickname.errors }}
+      </div>
+
+      <div class="form-section">
+        {{ form.email.label_tag }}
+        {{ form.email }}
+        {{ form.email.errors }}
+      </div>
+
+      <div class="form-section">
+        <label for="id_password1">パスワード</label>
+
+        <!-- ★ここで手動でinputを書く -->
+        <input type="password" name="password1" id="id_password1" required
+               style="width: 100%; padding: 8px; border: 1px solid #ccc; border-radius: 6px;">
+        <p style="font-size: 0.9em; color: #666;">
+          ※ 8文字以上で、英字と数字をそれぞれ1文字以上含めてください。
+        </p>
+        {{ form.password1.errors }}
+      </div>
+      
+      <div class="form-section">
+        {{ form.password2.label_tag }}
+        {{ form.password2 }}
+        {{ form.password2.errors }}
+        <p style="font-size: 0.9em; color: #666;">
+            ※ 確認のため、同じパスワードをもう一度入力してください。
+        </p>
+      </div>
+      
+
+        {% if form.non_field_errors %}
+          <ul class="errorlist">
+            {% for error in form.non_field_errors %}
+              <li>{{ error }}</li>
+            {% endfor %}
+          </ul>
+        {% endif %}
+
+
+      <button type="submit">登録する</button>
     </form>
-</body>
-</html>
+  </div>
+</div>
+{% endblock %}
+

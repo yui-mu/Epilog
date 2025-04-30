@@ -2,6 +2,25 @@
 
 {% block content %}
 
+{% if messages %}
+  <div style="max-width: 700px; margin: 20px auto;">
+    {% for message in messages %}
+      <div style="
+        background-color: #d4edda;
+        color: #155724;
+        padding: 12px 18px;
+        border-radius: 6px;
+        border: 1px solid #c3e6cb;
+        font-weight: bold;
+        text-align: center;
+        margin-bottom: 20px;
+      ">
+        {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
 <h2 style="text-align: center; margin-top: 20px;">スキンケア記録カレンダー</h2>
 
 <style>

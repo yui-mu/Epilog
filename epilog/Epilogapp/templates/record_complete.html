@@ -1,0 +1,23 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div style="max-width: 600px; margin: 60px auto; text-align: center;">
+  <h2 style="color: #2e5947;">スキンケア記録が完了しました！</h2>
+  <p style="margin: 20px 0; font-size: 16px;">ご記録ありがとうございます。</p>
+
+  <a href="{% url 'home' %}" style="
+      display: inline-block;
+      padding: 12px 24px;
+      background-color: #3ba58b;
+      color: white;
+      text-decoration: none;
+      border-radius: 8px;
+      font-weight: bold;
+      font-size: 16px;
+  ">
+    ホーム（カレンダー）に戻る
+  </a>
+</div>
+
+{% endblock %}
+

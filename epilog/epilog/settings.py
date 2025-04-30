@@ -97,6 +97,9 @@ AUTH_PASSWORD_VALIDATORS = [
     {
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
+    {
+        'NAME': 'Epilogapp.validators.validate_password_contains_letters_and_numbers',
+    },
 ]
 
 
@@ -128,3 +131,4 @@ EMAIL_BACKEND = 'django.core.mail.backends.console.EmailBackend'
 DEFAULT_FROM_EMAIL = 'noreply@epilogapp.com'
 MEDIA_URL = '/media/'
 MEDIA_ROOT = BASE_DIR / 'media'
+LOGOUT_REDIRECT_URL = 'logged_out'

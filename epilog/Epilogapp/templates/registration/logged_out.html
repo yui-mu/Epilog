@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+
+{% block content %}
+  <div style="text-align: center; margin-top: 100px;">
+    <h2>ログアウトしました</h2>
+    <p>ご利用ありがとうございました。</p>
+    <a href="{% url 'home' %}" style="display: inline-block; padding: 10px 20px; background-color: #4CAF50; color: white; border-radius: 8px; text-decoration: none;">
+      トップページに戻る
+    </a>
+  </div>
+{% endblock %}

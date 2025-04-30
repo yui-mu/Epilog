@@ -1,12 +1,13 @@
 from django.urls import path
 from django.contrib.auth import views as auth_views
+from django.views.generic import TemplateView
 from django.contrib.auth.views import (
     PasswordChangeView, 
     PasswordChangeDoneView,
     PasswordResetView,
     PasswordResetDoneView,
     PasswordResetConfirmView,
-    PasswordResetCompleteView,       
+    PasswordResetCompleteView,      
 )
 from . import views
 from .views import (
@@ -32,7 +33,9 @@ from .views import (
     user_record_calendar_events_view,
     profile_view,
     edit_profile_view,
-    edit_account_view
+    edit_account_view,
+    email_login_view,
+    toggle_favorite_ajax
     
     )
 
@@ -41,7 +44,6 @@ from .views import (
 urlpatterns = [
     path('', top_view, name='top'),
     path('register/', register_view, name='register'),
-    path('login/', auth_views.LoginView.as_view(template_name='login.html'), name='login'),
     path('logout/', auth_views.LogoutView.as_view(), name='logout'),
     path('home/', home_view, name='home'),
     path('record/create/', record_create_view, name='record_create'),
@@ -76,5 +78,9 @@ urlpatterns = [
     path('profile/', profile_view, name='profile'),
     path('profile/edit/', edit_profile_view, name='edit_profile'),
     path('account/edit/', edit_account_view, name='edit_account'),
+    path('logged_out/', TemplateView.as_view(template_name='registration/logged_out.html'), name='logged_out'),
+    path('login/', email_login_view, name='login'),
+    path('favorite/ajax/toggle/', toggle_favorite_ajax, name='toggle_favorite_ajax'),
+
 
 ]

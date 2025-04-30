@@ -6,13 +6,29 @@ from django.conf import settings
 
 
 class CustomUser(AbstractUser):
+    email = models.EmailField("メールアドレス", unique=True)
     nickname = models.CharField("ニックネーム", max_length=64)
+    username = models.CharField(
+        max_length=30,
+        unique=True,
+        verbose_name='ユーザー名',
+        help_text='30文字以下で入力してください。英数字と @/./+/-/_ が使えます。',
+        error_messages={
+            'unique': "このユーザー名は既に使用されています。",
+        },
+    )
     is_advisor = models.BooleanField("アドバイザーかどうか", default=False)
     age = models.PositiveIntegerField("年齢", null=True, blank=True)  
     profile_photo = models.ImageField("プロフィール写真", upload_to='profile_photos/', null=True, blank=True)
     concerns = models.ManyToManyField('Concern', blank=True, verbose_name="肌悩み")  
     created_at = models.DateTimeField("作成日時", auto_now_add=True)
     updated_at = models.DateTimeField("更新日時", auto_now=True)
+    
+    
+    USERNAME_FIELD = 'email'  # ← これで「email」でログインするようになる
+    REQUIRED_FIELDS = ['username']  # 管理コマンド用に必要なフィールド
+
+
 
     def __str__(self):
         return self.username

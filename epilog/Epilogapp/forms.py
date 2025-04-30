@@ -5,36 +5,67 @@ from django.contrib.auth import get_user_model
 from .models import CustomUser
 from .models import SkincareRecord
 from .models import Product, Concern, SkinType
-from .models import Ingredient
+
 
 class CustomUserCreationForm(UserCreationForm):
     class Meta:
         model = CustomUser
         fields = ('username', 'nickname', 'email', 'password1', 'password2')
+
+SKIN_CONCERN_CHOICES = [
+    ('dry', '乾燥'),
+    ('dull', 'くすみ'),
+    ('wrinkle', 'シワたるみ'),
+    ('spot', 'シミ'),
+    ('pore', '毛穴'),
+    ('acne', '赤み・ニキビ'),
+]
+
+SKIN_RATING_CHOICES = [
+    ('very_good', 'とても良い'),
+    ('good', '良い'),
+    ('normal', '普通'),
+    ('slightly_bad', 'やや悪い'),
+    ('bad', '悪い'),
+]
+
 class SkincareRecordForm(forms.ModelForm):
+    skin_rating = forms.ChoiceField(
+        choices=SKIN_RATING_CHOICES,
+        widget=forms.RadioSelect,
+        required=True,
+        label='肌の調子'
+    )
+
+    concerns = forms.MultipleChoiceField(
+        choices=SKIN_CONCERN_CHOICES,
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label='肌悩み'
+    )
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.fields['record_date'].widget.attrs['readonly'] = True
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        # ✅ cleaned_data から skin_rating をモデルに渡す（これがないと空になる）
+        instance.skin_rating = self.cleaned_data['skin_rating']
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
+
     class Meta:
         model = SkincareRecord
         fields = [
-            'record_date',
-            'skin_rating',
-            'skin_condition',
-            'photo',
-            'morning_items',     
-            'night_items',       
-            'concerns',          
-            'ingredients',       
+            'record_date', 'photo', 'skin_condition',
+            'morning_items', 'night_items',
+            'skin_rating', 'concerns'
         ]
 
-        widgets = {
-            'record_date': forms.DateInput(attrs={'type': 'date'}),
-            'skin_rating': forms.RadioSelect(),
-            'skin_condition': forms.Textarea(attrs={'rows': 3}),
-            'morning_items': forms.Textarea(attrs={'rows': 2}),
-            'night_items': forms.Textarea(attrs={'rows': 2}),
-            'concerns': forms.Textarea(attrs={'rows': 2}),
-            'ingredients': forms.Textarea(attrs={'rows': 2}),
-        }
-        
+
 class ProductForm(forms.ModelForm):
     class Meta:
         model = Product
@@ -111,3 +142,13 @@ class EditAccountForm(forms.ModelForm):
             'username': 'ユーザー名',
             'email': 'メールアドレス',
         }
+        
+class EmailLoginForm(forms.Form):
+    email = forms.EmailField(label='メールアドレス', widget=forms.EmailInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'you@example.com'
+    }))
+    password = forms.CharField(label='パスワード', widget=forms.PasswordInput(attrs={
+        'class': 'form-control',
+        'placeholder': 'パスワードを入力'
+    }))

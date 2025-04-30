@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block content %}
+
+<style>
+  .product-grid {
+    list-style: none;
+    padding: 0;
+    margin: 0 auto;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 20px;
+    justify-content: center;
+    max-width: 1000px;
+  }
+
+  .product-card {
+    width: 250px;
+    padding: 15px;
+    border: 1px solid #ccc;
+    border-radius: 10px;
+    text-align: center;
+    background-color: #fff;
+    box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+  }
+
+  .product-card img {
+    width: 100%;
+    height: 200px;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .favorite-btn {
+    font-size: 24px;
+    border: none;
+    background: none;
+    color: red;
+    cursor: pointer;
+    margin-top: 10px;
+  }
+</style>
+
+  <h1 class="page-title">お気に入り</h1>
+
+  <div class="product-list" style="display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 20px;">
+    {% for fav in favorites %}
+      <div class="product-card" style="border: 1px solid #ccc; padding: 10px; text-align: center;">
+        <img src="{{ fav.product.image.url }}" alt="{{ fav.product.name }}" style="width: 100%; height: auto; max-height: 300px; object-fit: contain;">
+        <h3>{{ fav.product.name }}</h3>
+        <p>{{ fav.product.description }}</p>
+
+        <!-- ❤️ お気に入り解除フォーム -->
+        <form method="post" action="{% url 'remove_favorite' fav.product.id %}">
+          {% csrf_token %}
+          <button type="submit" style="background: none; border: none; font-size: 24px; color: red; cursor: pointer;">❤</button>
+        </form>
+      </div>
+    {% empty %}
+      <p>お気に入り登録された商品はまだありません。</p>
+    {% endfor %}
+  </div>
+{% endblock %}
