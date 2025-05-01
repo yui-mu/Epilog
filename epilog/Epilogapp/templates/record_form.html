@@ -340,8 +340,7 @@
         <button type="button" id="add-morning-item">＋項目を追加する</button>
         {{ form.morning_items.as_hidden }}
       </div>
-      
-
+    
       <!-- 夜 -->
       <div class="care-block" id="night-block">
         <strong>🌙 夜に使ったアイテム</strong>
@@ -369,7 +368,6 @@
             </div>
           {% endfor %}
         </div>
-          
         <button type="button" id="add-night-item">＋項目を追加する</button>
         {{ form.night_items.as_hidden }}
       </div>
@@ -429,14 +427,37 @@
         }
       });
     }
+
+    function extractItemsFromCsv(csvStr, maxItems) {
+      const items = csvStr.split(',')
+        .map(s => s.trim())
+        .filter(Boolean)
+        .filter(s => s.includes(':')); // カテゴリ:商品名の形式のみ
+      return items.slice(0, maxItems);
+    }
+    
+    const morningRaw = "{{ form.morning_items.value|escapejs }}";
+    const nightRaw = "{{ form.night_items.value|escapejs }}";
+    
+    const morningCsv = extractItemsFromCsv(morningRaw, 6).join(',');
+    const nightCsv = extractItemsFromCsv(nightRaw, 6).join(',');
+    
+    populateSimpleInputs(morningCsv, "morning-inputs", "morning-input-name");
+    populateSimpleInputs(nightCsv, "night-inputs", "night-input-name");
+    
   
     // ✅ 編集時の初期商品名の表示（朝・夜）1～6件目まで表示
-    function populateSimpleInputs(csvStr, sectionId, inputClass) {
-      const names = csvStr.split(',').map(s => s.trim()).filter(Boolean);
+    function populateSimpleInputs(csvStr, sectionId, inputClass, maxInitial = 6) {
+      const items = csvStr.split(',').map(s => s.trim()).filter(Boolean);
       const container = document.getElementById(sectionId);
       container.innerHTML = "";
-  
-      names.forEach((name, index) => {
+
+      items.forEach((item, index) => {
+        if (!item) return;
+
+        const [category, name] = item.includes(':') ? item.split(':', 2) : ['未分類', item];
+        if (index >= maxInitial) return;  // ✅ 7件目以降は非表示
+
         const div = document.createElement("div");
         div.className = "item-row";
         div.innerHTML = `
@@ -444,23 +465,32 @@
             <button type="button" class="remove-btn">－</button>
             <label class="item-label">${index + 1}番目：</label>
           </div>
+          <select class="${inputClass}-select">
+            <option value="">種類を選択</option>
+            <option value="クレンジング" ${category === "クレンジング" ? "selected" : ""}>クレンジング</option>
+            <option value="洗顔" ${category === "洗顔" ? "selected" : ""}>洗顔</option>
+            <option value="導入美容液" ${category === "導入美容液" ? "selected" : ""}>導入美容液</option>
+            <option value="化粧水" ${category === "化粧水" ? "selected" : ""}>化粧水</option>
+            <option value="乳液" ${category === "乳液" ? "selected" : ""}>乳液</option>
+            <option value="美容液" ${category === "美容液" ? "selected" : ""}>美容液</option>
+            <option value="クリーム" ${category === "クリーム" ? "selected" : ""}>クリーム</option>
+            <option value="パック" ${category === "パック" ? "selected" : ""}>パック</option>
+            <option value="その他" ${category === "その他" ? "selected" : ""}>その他</option>
+          </select>
           <input type="text" class="${inputClass}" value="${name}" placeholder="商品名">
           <input type="text" class="${inputClass}-ingredient" placeholder="成分名（任意）">
         `;
         container.appendChild(div);
       });
-  
+
       updateListeners();
       renumberItems(`#${sectionId}`);
     }
-  
-    // ✅ 初期表示（最大6件）に分割して制限
-    const morningCsv = "{{ form.morning_items.value|escapejs }}".split(',').slice(0, 6).join(',');
-    const nightCsv = "{{ form.night_items.value|escapejs }}".split(',').slice(0, 6).join(',');
-  
-    populateSimpleInputs(morningCsv, "morning-inputs", "morning-input-name");
-    populateSimpleInputs(nightCsv, "night-inputs", "night-input-name");
-  
+
+    // ✅ 呼び出し（初期表示6件まで）
+    populateSimpleInputs("{{ form.morning_items.value|escapejs }}", "morning-inputs", "morning-input-name", 6);
+    populateSimpleInputs("{{ form.night_items.value|escapejs }}", "night-inputs", "night-input-name", 6);
+
     // ✅ 朝の追加処理（6件目以降）
     const morningInputs = document.getElementById("morning-inputs");
     const addMorningBtn = document.getElementById("add-morning-item");
@@ -475,8 +505,20 @@
         div.className = "item-row";
         div.innerHTML = `
           <button type="button" class="remove-btn">－</button>
-          <label>番目：</label><br>
-          <input type="text" class="morning-input-name" placeholder="商品名"><br>
+          <label>番目：</label>
+          <select class="morning-select-type">
+            <option value="">種類を選択</option>
+            <option value="クレンジング">クレンジング</option>
+            <option value="洗顔">洗顔</option>
+            <option value="導入美容液">導入美容液</option>
+            <option value="化粧水">化粧水</option>
+            <option value="乳液">乳液</option>
+            <option value="美容液">美容液</option>
+            <option value="クリーム">クリーム</option>
+            <option value="パック">パック</option>
+            <option value="その他">その他</option>
+          </select>
+          <input type="text" class="morning-input-name" placeholder="商品名">
           <input type="text" class="morning-input-ingredient" placeholder="成分名（任意）">
         `;
         morningInputs.appendChild(div);
@@ -484,7 +526,7 @@
         renumberItems('#morning-inputs');
       });
     }
-  
+
     // ✅ 夜の追加処理（6件目以降）
     const nightInputs = document.getElementById("night-inputs");
     const addNightBtn = document.getElementById("add-night-item");
@@ -499,8 +541,20 @@
         div.className = "item-row";
         div.innerHTML = `
           <button type="button" class="remove-btn">－</button>
-          <label>番目：</label><br>
-          <input type="text" class="night-input-name" placeholder="商品名"><br>
+          <label>番目：</label>
+          <select class="night-select-type">
+            <option value="">種類を選択</option>
+            <option value="クレンジング">クレンジング</option>
+            <option value="洗顔">洗顔</option>
+            <option value="導入美容液">導入美容液</option>
+            <option value="化粧水">化粧水</option>
+            <option value="乳液">乳液</option>
+            <option value="美容液">美容液</option>
+            <option value="クリーム">クリーム</option>
+            <option value="パック">パック</option>
+            <option value="その他">その他</option>
+          </select>
+          <input type="text" class="night-input-name" placeholder="商品名">
           <input type="text" class="night-input-ingredient" placeholder="成分名（任意）">
         `;
         nightInputs.appendChild(div);
@@ -508,8 +562,8 @@
         renumberItems('#night-inputs');
       });
     }
-  
-    // ✅ 削除ボタン処理
+
+    // ✅ 削除・番号更新処理
     function updateListeners() {
       document.querySelectorAll('.remove-btn').forEach(btn => {
         btn.onclick = () => {
@@ -520,8 +574,7 @@
         };
       });
     }
-  
-    // ✅ 番号振り直し
+
     function renumberItems(parentSelector) {
       const container = document.querySelector(parentSelector);
       if (!container) return;
@@ -531,6 +584,7 @@
         if (label) label.textContent = `${index + 1}番目：`;
       });
     }
+
   
     // ✅ hiddenに反映（保存用）
     function updateSimpleInputs(parentSelector, inputClass, targetId) {
