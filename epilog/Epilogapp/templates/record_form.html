@@ -268,20 +268,22 @@
       <strong>{{ form.skin_rating.label }}</strong>
       <div class="condition-icons">
         {% for value, label in form.fields.skin_rating.choices %}
-          <label class="face-label skin-rating-option"
-                 style="display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 5px; border-radius: 8px;">
-            <input type="radio" name="skin_rating" value="{{ value }}"
-              {% if form.data.skin_rating == value|stringformat:"s" %}checked{% endif %}>
-            <span class="icon" style="font-size: 32px;">
-              {% if label == "とても良い" %} 😄
-              {% elif label == "良い" %} 🙂 
-              {% elif label == "普通" %} 😐 
-              {% elif label == "やや悪い" %} 😕 
-              {% elif label == "悪い" %} 😣 
-              {% endif %}
-            </span>
-            <span class="label-text">{{ label }}</span>
-          </label>
+          {% if label != '---------' %}
+            <label class="face-label skin-rating-option"
+                  style="display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 5px; border-radius: 8px;">
+              <input type="radio" name="skin_rating" value="{{ value }}"
+                {% if form.data.skin_rating == value|stringformat:"s" %}checked{% endif %}>
+              <span class="icon" style="font-size: 32px;">
+                {% if label == "とても良い" %} 😄
+                {% elif label == "良い" %} 🙂 
+                {% elif label == "普通" %} 😐 
+                {% elif label == "やや悪い" %} 😕 
+                {% elif label == "悪い" %} 😣 
+                {% endif %}
+              </span>
+              <span class="label-text">{{ label }}</span>
+            </label>
+          {% endif %}
         {% endfor %}
       </div>
     </div>

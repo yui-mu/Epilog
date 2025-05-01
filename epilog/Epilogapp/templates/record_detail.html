@@ -1,36 +1,71 @@
 {% extends 'base.html' %}
-   
+
 {% block content %}
-    <h1>記録の詳細</h1>
+<div class="container" style="max-width: 700px; margin: 0 auto; padding: 2em;">
+  <h2 style="font-weight: bold; color: #2e5940; margin-bottom: 1em;">記録の詳細</h2>
 
-    <p><strong>日付：</strong>{{ record.record_date }}</p>
-    <p><strong>肌の調子：</strong>{{ record.get_skin_rating_display }}</p>
-    <p><strong>肌の状態メモ：</strong>{{ record.skin_condition }}</p>
-    <h4>🌞 朝に使ったアイテム（使用順）</h4>
-<ol>
-  {% for item in morning_list %}
-    <li>{{ item }}</li>
-  {% endfor %}
-</ol>
+  <p><strong>日付：</strong>{{ record.record_date }}</p>
 
-    <h4>🌙 夜に使ったアイテム（使用順）</h4>
-<ol>
-  {% for item in night_list %}
-    <li>{{ item }}</li>
-  {% endfor %}
-</ol>
-    <h4>肌悩み：</h4>
-<p>{{ record.concerns }}</p>
-    <h4>成分：</h4>
-<p>{{ record.ingredients }}</p>
-
-    {% if record.photo %}
-        <p><strong>写真：</strong><br>
-        <img src="{{ record.photo.url }}" alt="肌の写真" width="200"></p>
+  <p><strong>肌の調子：</strong>
+    {% if record.skin_rating == 1 %} 😄 とても良い
+    {% elif record.skin_rating == 2 %} 🙂 良い
+    {% elif record.skin_rating == 3 %} 😐 普通
+    {% elif record.skin_rating == 4 %} 😕 やや悪い
+    {% elif record.skin_rating == 5 %} 😣 悪い
     {% endif %}
-    <p>
-        <a href="{% url 'record_edit' record.pk %}" class="btn btn-primary">編集</a>
-      </p>
+  </p>
 
-    <p><a href="{% url 'record_list' %}">← 一覧に戻る</a></p>
+  <p><strong>肌の状態メモ：</strong>{{ record.skin_condition|default:"（記入なし）" }}</p>
+
+  <h4 style="margin-top: 1.5em;">🌞 朝に使ったアイテム（使用順）</h4>
+  {% if morning_list %}
+    <ol>
+      {% for item in morning_list %}
+        <li>{{ item }}</li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p>（記録なし）</p>
+  {% endif %}
+
+  <h4>🌙 夜に使ったアイテム（使用順）</h4>
+  {% if night_list %}
+    <ol>
+      {% for item in night_list %}
+        <li>{{ item }}</li>
+      {% endfor %}
+    </ol>
+  {% else %}
+    <p>（記録なし）</p>
+  {% endif %}
+
+  <h4>肌悩み：</h4>
+  {% with concerns_list|length as count %}
+    {% if count > 0 and concerns_list.0 %}
+      <ul>
+        {% for concern in concerns_list %}
+          {% if concern %}
+            <li>{{ concern }}</li>
+          {% endif %}
+        {% endfor %}
+      </ul>
+    {% else %}
+      <p>（記録なし）</p>
+    {% endif %}
+  {% endwith %}
+
+
+  <p><strong>成分：</strong>{{ record.ingredients|default:"（記録なし）" }}</p>
+
+  {% if record.photo %}
+    <p><strong>写真：</strong><br>
+      <img src="{{ record.photo.url }}" alt="肌の写真" style="max-width: 200px; border-radius: 8px; margin-top: 10px;">
+    </p>
+  {% endif %}
+
+  <div style="margin-top: 2em;">
+    <a href="{% url 'record_edit' record.pk %}" class="btn btn-outline-primary" style="margin-right: 10px;">編集</a>
+    <a href="{% url 'record_list' %}" class="btn btn-link">← 一覧に戻る</a>
+  </div>
+</div>
 {% endblock %}
