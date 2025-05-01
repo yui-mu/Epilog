@@ -7,13 +7,17 @@
   <p><strong>日付：</strong>{{ record.record_date }}</p>
 
   <p><strong>肌の調子：</strong>
-    {% if record.skin_rating == 1 %} 😄 とても良い
-    {% elif record.skin_rating == 2 %} 🙂 良い
-    {% elif record.skin_rating == 3 %} 😐 普通
-    {% elif record.skin_rating == 4 %} 😕 やや悪い
-    {% elif record.skin_rating == 5 %} 😣 悪い
-    {% endif %}
+    <span style="font-size: 1.5em;">
+      {% if record.skin_rating == 1 %} 😄
+      {% elif record.skin_rating == 2 %} 🙂 
+      {% elif record.skin_rating == 3 %} 😐 
+      {% elif record.skin_rating == 4 %} 😕 
+      {% elif record.skin_rating == 5 %} 😣 
+      {% endif %}
+    </span>
+    {{ record.get_skin_rating_display }}
   </p>
+  
 
   <p><strong>肌の状態メモ：</strong>{{ record.skin_condition|default:"（記入なし）" }}</p>
 
@@ -40,22 +44,19 @@
   {% endif %}
 
   <h4>肌悩み：</h4>
-  {% with concerns_list|length as count %}
-    {% if count > 0 and concerns_list.0 %}
-      <ul>
-        {% for concern in concerns_list %}
-          {% if concern %}
-            <li>{{ concern }}</li>
-          {% endif %}
-        {% endfor %}
-      </ul>
+  <p>
+    {% if concerns_list %}
+      {{ concerns_list|join:"、" }}
     {% else %}
-      <p>（記録なし）</p>
+      （記録なし）
     {% endif %}
-  {% endwith %}
+  </p>
+  
+  
+  
 
 
-  <p><strong>成分：</strong>{{ record.ingredients|default:"（記録なし）" }}</p>
+  <p><strong>成分：</strong><br>{{ record.ingredients|linebreaksbr|default:"（記録なし）" }}</p>
 
   {% if record.photo %}
     <p><strong>写真：</strong><br>

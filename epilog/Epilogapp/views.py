@@ -1,5 +1,4 @@
 from django.shortcuts import render, redirect, get_object_or_404
-import ast
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
 from django.http import JsonResponse, HttpResponseRedirect
@@ -20,7 +19,8 @@ from .forms import (
     EmailLoginForm,
     
     )
-from .models import SkincareRecord, Product, Favorite, Message, CustomUser
+from .models import SkincareRecord, Product, Favorite, Message, CustomUser, SKIN_CONCERN_CHOICES
+import ast
 
 
 def register_view(request):
@@ -170,17 +170,19 @@ def record_detail_view(request, pk):
     morning_list = [s.strip() for s in (record.morning_items or "").split(',') if s.strip()]
     night_list = [s.strip() for s in (record.night_items or "").split(',') if s.strip()]
     
+    CONCERN_DICT = dict(SKIN_CONCERN_CHOICES)
     concerns_list = []
+    
     if record.concerns:
         try:
             parsed = ast.literal_eval(record.concerns)
             if isinstance(parsed, list):
-                concerns_list = [item for item in parsed if item.strip()] # 空文字を除外
+                concerns_list = [CONCERN_DICT.get(item.strip(), item.strip()) for item in parsed if item.strip()]
             elif isinstance(parsed, str) and parsed.strip():
-                concerns_list = [parsed.strip()]
+                concerns_list = [CONCERN_DICT.get(parsed.strip(), parsed.strip())]
         except:
             if record.concerns.strip():
-                concerns_list = [record.concerns.strip()]
+                concerns_list = [CONCERN_DICT.get(record.concerns.strip(), record.concerns.strip())]
 
     return render(request, 'record_detail.html', {
         'record': record,

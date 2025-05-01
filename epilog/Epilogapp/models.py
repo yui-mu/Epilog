@@ -2,6 +2,21 @@ from django.contrib.auth.models import AbstractUser
 from django.db import models
 from django.conf import settings
 
+RATING_CHOICES = [
+        (1, 'とても良い'),
+        (2, '良い'),
+        (3, '普通'),
+        (4, 'やや悪い'),
+        (5, '悪い'),
+    ]
+SKIN_CONCERN_CHOICES = [
+    ('dry', '乾燥'),
+    ('dull', 'くすみ'),
+    ('wrinkle', 'シワたるみ'),
+    ('spot', 'シミ'),
+    ('pore', '毛穴'),
+    ('acne', '赤み・ニキビ'),
+]
 
 
 
@@ -35,14 +50,7 @@ class CustomUser(AbstractUser):
 
     
 class SkincareRecord(models.Model):
-    RATING_CHOICES = [
-        (1, 'とても良い'),
-        (2, '良い'),
-        (3, '普通'),
-        (4, 'やや悪い'),
-        (5, '悪い'),
-    ]
-
+    
     user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     record_date = models.DateField("記録日")
     skin_condition = models.TextField("肌の状態メモ", blank=True)

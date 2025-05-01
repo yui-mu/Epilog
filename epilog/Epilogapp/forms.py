@@ -43,6 +43,11 @@ class SkincareRecordForm(forms.ModelForm):
 
     def save(self, commit=True):
         instance = super().save(commit=False)
+        concerns = self.cleaned_data.get('concerns')
+        if commit:
+            instance.concerns = ', '.join(concerns)
+        else:
+            instance.concerns = ''
         if commit:
             instance.save()
             self.save_m2m()
