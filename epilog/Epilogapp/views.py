@@ -134,12 +134,18 @@ def record_edit_view(request, pk):
     if request.method == 'POST':
         form = SkincareRecordForm(request.POST, request.FILES, instance=record)
         if form.is_valid():
-            form.save()
-            return redirect('record_list')
+            record = form.save(commit=False)
+
+            record.morning_items = request.POST.get('morning_items', '')
+            record.night_items = request.POST.get('night_items', '')
+
+            record.save()
+            return redirect('record_detail', pk=record.pk)
     else:
         form = SkincareRecordForm(instance=record)
 
     return render(request, 'record_form.html', {'form': form})
+
 
                    
 
@@ -165,10 +171,29 @@ def calendar_events_view(request):
 @login_required
 def record_detail_view(request, pk):
     record = get_object_or_404(SkincareRecord, pk=pk, user=request.user)
+    
+    print("DEBUG - morning_items:", record.morning_items)
+    print("DEBUG - night_items:", record.night_items)
 
-    # 朝・夜のアイテムをリストに変換
-    morning_list = [s.strip() for s in (record.morning_items or "").split(',') if s.strip()]
-    night_list = [s.strip() for s in (record.night_items or "").split(',') if s.strip()]
+
+    # カテゴリと商品名に分割する関数（辞書形式で返す）
+    def parse_items(item_string):
+        result = []
+        for item in item_string.split(','):
+            item = item.strip()
+            if not item:
+                continue
+            if ':' in item:
+                category, name = item.split(':', 1)
+            else:
+                category, name = '未分類', item
+            result.append({'category': category.strip(), 'name': name.strip()})
+        return result
+
+
+    morning_list = parse_items(record.morning_items or "")
+    night_list = parse_items(record.night_items or "")
+
     
     CONCERN_DICT = dict(SKIN_CONCERN_CHOICES)
     concerns_list = []

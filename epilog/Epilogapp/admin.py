@@ -2,6 +2,7 @@ from django.contrib import admin
 from .models import Product, Ingredient, Concern, Favorite, Message, SkinType
 from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser
+from .models import SkincareRecord
 
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
@@ -16,4 +17,5 @@ admin.site.register(SkinType)
 admin.site.register(Favorite) 
 admin.site.register(Message)
 admin.site.register(CustomUser, CustomUserAdmin)
+admin.site.register(SkincareRecord)
 # Register your models here.

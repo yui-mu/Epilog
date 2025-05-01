@@ -17,7 +17,6 @@
     </span>
     {{ record.get_skin_rating_display }}
   </p>
-  
 
   <p><strong>肌の状態メモ：</strong>{{ record.skin_condition|default:"（記入なし）" }}</p>
 
@@ -25,7 +24,7 @@
   {% if morning_list %}
     <ol>
       {% for item in morning_list %}
-        <li>{{ item }}</li>
+        <li>{{ item.name }}</li>
       {% endfor %}
     </ol>
   {% else %}
@@ -36,7 +35,7 @@
   {% if night_list %}
     <ol>
       {% for item in night_list %}
-        <li>{{ item }}</li>
+        <li>{{ item.name }}</li>
       {% endfor %}
     </ol>
   {% else %}
@@ -51,10 +50,6 @@
       （記録なし）
     {% endif %}
   </p>
-  
-  
-  
-
 
   <p><strong>成分：</strong><br>{{ record.ingredients|linebreaksbr|default:"（記録なし）" }}</p>
 

@@ -1,22 +1,54 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-    <meta charset="UTF-8">
-    <title>EpiLog トップページ</title>
-</head>
-<body>
-    <h1>ようこそ EpiLog へ！</h1>
+{% extends 'base.html' %}
+{% block content %}
 
-    {% if user.is_authenticated %}
-        <p>こんにちは、{{ user.username }} さん！</p>
-        <p><a href="{% url 'home' %}">ホームへ</a></p>
-        <form method="post" action="{% url 'logout' %}">
-            {% csrf_token %}
-            <button type="submit">ログアウト</button>
-        </form>
-    {% else %}
-        <p><a href="{% url 'login' %}">ログイン</a></p>
-        <p><a href="{% url 'register' %}">新規登録</a></p>
-    {% endif %}
-</body>
-</html>
+<style>
+  .top-container {
+    max-width: 800px;
+    margin: 60px auto;
+    padding: 40px 20px;
+    background-color: #ffffff;
+    border-radius: 12px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    text-align: center;
+  }
+
+  .top-container h1 {
+    font-size: 28px;
+    margin-bottom: 20px;
+    color: #2a7c6f;
+  }
+
+  .top-container p {
+    font-size: 18px;
+    margin-bottom: 20px;
+  }
+
+  .top-container a {
+    display: inline-block;
+    margin: 10px;
+    padding: 10px 16px;
+    background-color: #a7d7c5;
+    color: white;
+    border-radius: 8px;
+    text-decoration: none;
+  }
+
+  .top-container a:hover {
+    background-color: #8cc9b3;
+  }
+</style>
+
+<div class="top-container">
+  <h1>ようこそ EpiLog へ！</h1>
+  <p>こんにちは、{{ user.username }} さん！</p>
+  <a href="{% url 'home' %}">ホームへ</a>
+  <form action="{% url 'logout' %}" method="post" style="display: inline;">
+    {% csrf_token %}
+    <button type="submit" style="background: none; border: none; color: white; background-color: #a7d7c5; border-radius: 8px; padding: 10px 16px; cursor: pointer;">
+      ログアウト
+    </button>
+  </form>
+  
+</div>
+
+{% endblock %}

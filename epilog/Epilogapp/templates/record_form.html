@@ -157,7 +157,9 @@
     text-align: center;
     padding: 8px;
     cursor: pointer;
+    display: inline-block;
   }
+
 
   .skin-rating-option .icon {
     font-size: 32px;
@@ -173,12 +175,23 @@
   }
 
   .skin-rating-option input[type="radio"] {
-    display: none;
+    position: absolute;
+    opacity: 0;
+    pointer-events: none;
   }
+  
 
   .skin-rating-option .label-text {
     margin-top: 5px;
     font-size: 14px;
+  }
+
+  .skin-rating-widget {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    flex-wrap: wrap;
+    margin-top: 10px;
   }
 
   .photo-section {
@@ -228,22 +241,25 @@
 
 <div class="record-container">
   <h1 class="page-title" style="text-align:center;">スキンケア記録フォーム</h1>
-
-  <form method="post" enctype="multipart/form-data">
+  <form method="post" enctype="multipart/form-data"
+    onsubmit="
+      updateInputs('#morning-inputs', 'morning-input-name', 'morning-select-type', '{{ form.morning_items.id_for_label }}');
+      updateInputs('#night-inputs', 'night-input-name', 'night-select-type', '{{ form.night_items.id_for_label }}');
+    ">
     {% csrf_token %}
 
     {% if form.errors %}
-    <div style="background-color: #fce4e4; border: 1px solid #f5c2c2; color: #c72c2c;
-            padding: 10px; margin: 15px auto; max-width: 600px; border-radius: 6px;">
-      <ul>
-        {% for field in form %}
-          {% for error in field.errors %}
-            <li>{{ field.label }}: {{ error }}</li>
+      <div style="background-color: #fce4e4; border: 1px solid #f5c2c2; color: #c72c2c;
+              padding: 10px; margin: 15px auto; max-width: 600px; border-radius: 6px;">
+        <ul>
+          {% for field in form %}
+            {% for error in field.errors %}
+              <li>{{ field.label }}: {{ error }}</li>
+            {% endfor %}
           {% endfor %}
-        {% endfor %}
-      </ul>
-    </div>
-  {% endif %}
+        </ul>
+      </div>
+    {% endif %}
 
     <!-- 肌の写真アップロード -->
     <div class="photo-section">
@@ -262,47 +278,28 @@
       </div>
     </div>
     
-
-    <!-- 肌の調子（顔アイコン付き） -->
+    <!-- ✅ 肌の調子：顔アイコン選択処理 -->
     <div class="form-group">
       <strong>{{ form.skin_rating.label }}</strong>
-      <div class="condition-icons">
-        {% for value, label in form.fields.skin_rating.choices %}
-          {% if label != '---------' %}
-            <label class="face-label skin-rating-option"
-                  style="display: flex; flex-direction: column; align-items: center; cursor: pointer; padding: 5px; border-radius: 8px;">
-              <input type="radio" name="skin_rating" value="{{ value }}"
-                {% if form.data.skin_rating == value|stringformat:"s" %}checked{% endif %}>
-              <span class="icon" style="font-size: 32px;">
-                {% if label == "とても良い" %} 😄
-                {% elif label == "良い" %} 🙂 
-                {% elif label == "普通" %} 😐 
-                {% elif label == "やや悪い" %} 😕 
-                {% elif label == "悪い" %} 😣 
+      <div class="skin-rating-widget">
+        {% for radio in form.skin_rating %}
+          {% if radio.choice_label != '---------' %}
+            {{ radio.tag }}
+            <label for="{{ radio.id_for_label }}">
+              <span class="icon">
+                {% if radio.choice_label == "とても良い" %} 😄
+                {% elif radio.choice_label == "良い" %} 🙂
+                {% elif radio.choice_label == "普通" %} 😐
+                {% elif radio.choice_label == "やや悪い" %} 😕
+                {% elif radio.choice_label == "悪い" %} 😣
                 {% endif %}
               </span>
-              <span class="label-text">{{ label }}</span>
+              <span class="label-text">{{ radio.choice_label }}</span>
             </label>
           {% endif %}
         {% endfor %}
       </div>
     </div>
-    
-
-
-
-    <!-- 肌悩み -->
-    <div class="concern-block">
-      <p><strong>{{ form.concerns.label }}</strong></p>
-      <div style="display: flex; flex-wrap: wrap; gap: 15px; justify-content: center;">
-        {% for checkbox in form.concerns %}
-          <label style="display: flex; align-items: center; gap: 5px;">
-            {{ checkbox.tag }} {{ checkbox.choice_label }}
-          </label>
-        {% endfor %}
-      </div>
-    </div>
-    
 
     <!-- 肌の状態メモ -->
     <p>
@@ -323,7 +320,7 @@
                 <button type="button" class="remove-btn">－</button>
                 <label class="item-label">{{ forloop.counter }}番目：</label>
               </div>
-              <select class="item-type">
+              <select class="morning-select-type">
                 <option value="">種類を選択</option>
                 <option value="クレンジング">クレンジング</option>
                 <option value="洗顔">洗顔</option>
@@ -346,7 +343,7 @@
       
 
       <!-- 夜 -->
-      <div class="care-block" id="morning-block">
+      <div class="care-block" id="night-block">
         <strong>🌙 夜に使ったアイテム</strong>
         <div id="night-inputs">
           {% for i in "123456" %}
@@ -355,7 +352,7 @@
                 <button type="button" class="remove-btn">－</button>
                 <label class="item-label">{{ forloop.counter }}番目：</label>
               </div>
-              <select class="item-type">
+              <select class="night-select-type">
                 <option value="">種類を選択</option>
                 <option value="クレンジング">クレンジング</option>
                 <option value="洗顔">洗顔</option>
@@ -367,8 +364,8 @@
                 <option value="パック">パック</option>
                 <option value="その他">その他</option>
               </select>
-              <input type="text" class="morning-input-name" placeholder="商品名">
-              <input type="text" class="morning-input-ingredient" placeholder="成分名（任意）">
+              <input type="text" class="night-input-name" placeholder="商品名">
+              <input type="text" class="night--input-ingredient" placeholder="成分名（任意）">
             </div>
           {% endfor %}
         </div>
@@ -378,176 +375,186 @@
       </div>
     </div>
 
-    
+    <input type="hidden" name="morning_items" id="id_morning_items" value="{{ form.initial.morning_items|default:''|escape }}">
+    <input type="hidden" name="night_items" id="id_night_items" value="{{ form.initial.night_items|default:''|escape }}">
+
+
     <!-- 登録ボタン -->
     <div class="form-actions">
       <button type="submit">記録する</button>
     </div>
   </form>
-  
 </div>
 
 <!-- 入力内容をまとめて保存するJS -->
 <script>
   document.addEventListener("DOMContentLoaded", function () {
-    // ✅ 肌の調子：顔アイコン選択処理（最初に閉じる！）
-  const options = document.querySelectorAll('.skin-rating-option');
-  options.forEach(option => {
-    option.addEventListener('click', function () {
-      options.forEach(opt => opt.classList.remove('selected'));
-      this.classList.add('selected');
-
-      const radio = this.querySelector('input[type="radio"]');
-      if (radio) {
-        radio.checked = true;
-      }
+    
+    // ✅ 肌の調子：顔アイコン選択処理
+    const options = document.querySelectorAll('.skin-rating-option');
+    options.forEach(option => {
+      option.addEventListener('click', function () {
+        const radio = this.querySelector('input[type="radio"]');
+        
+        if (radio && !radio.checked) {
+          // 他のボタンの選択表示を外す
+          options.forEach(opt => opt.classList.remove('selected'));
+    
+          // このボタンを選択状態に
+          this.classList.add('selected');
+          radio.checked = true;
+    
+          // イベントを発火させる（Djangoフォームの検証等に必要な場合も）
+          const event = new Event('change', { bubbles: true });
+          radio.dispatchEvent(event);
+        }
+      });
     });
-  });
-
+  
+    // ✅ 編集時に選択されているラジオボタンに .selected を付ける
+    const selectedRating = document.querySelector('.skin-rating-option input[type="radio"]:checked');
+    if (selectedRating) {
+      selectedRating.closest('.skin-rating-option').classList.add('selected');
+    }
+  
     // ✅ 肌の写真プレビュー機能
     const previewButton = document.getElementById("preview-button");
     const photoInput = document.getElementById("id_photo");
     const previewImage = document.getElementById("preview-image");
+    if (previewButton) {
+      previewButton.addEventListener("click", function () {
+        const file = photoInput.files[0];
+        if (file) {
+          const reader = new FileReader();
+          reader.onload = function (e) {
+            previewImage.src = e.target.result;
+            previewImage.style.display = "block";
+          };
+          reader.readAsDataURL(file);
+        } else {
+          alert("画像ファイルを選択してください。");
+        }
+      });
+    }
   
-    previewButton.addEventListener("click", function () {
-      const file = photoInput.files[0];
-      if (file) {
-        const reader = new FileReader();
-        reader.onload = function (e) {
-          previewImage.src = e.target.result;
-          previewImage.style.display = "block";
-        };
-        reader.readAsDataURL(file);
-      } else {
-        alert("画像ファイルを選択してください。");
-      }
+  // ✅ 編集時の初期商品名の表示（朝・夜）※カテゴリなしの簡易版
+  function populateSimpleInputs(csvStr, sectionId, inputClass) {
+    const names = csvStr.split(',').map(s => s.trim()).filter(Boolean);
+    const container = document.getElementById(sectionId);
+    container.innerHTML = "";  // 既存のitem-rowを削除
+
+    names.forEach((name, index) => {
+      const div = document.createElement("div");
+      div.className = "item-row";
+      div.innerHTML = `
+        <div class="row-header">
+          <button type="button" class="remove-btn">－</button>
+          <label class="item-label">${index + 1}番目：</label>
+        </div>
+        <input type="text" class="${inputClass}" value="${name}" placeholder="商品名">
+        <input type="text" class="dummy-ingredient" placeholder="成分名（任意）">
+      `;
+      container.appendChild(div);
     });
+  }
+
+// 実行
+populateSimpleInputs("{{ form.morning_items.value|escapejs }}", "morning-inputs", "morning-input-name");
+populateSimpleInputs("{{ form.night_items.value|escapejs }}", "night-inputs", "night-input-name");
+
   
     // ✅ 朝アイテム追加・削除
-    let morningCount = 6;
-    const morningInputs = document.getElementById("morning-inputs");
+    const morningContainer = document.getElementById("morning-inputs");
     const addMorningBtn = document.getElementById("add-morning-item");
-  
-    addMorningBtn.addEventListener("click", function () {
-      const currentRows = morningInputs.querySelectorAll('.item-row').length;
-    
-      if (currentRows >= 10) {
-        alert("朝は最大10件まで追加できます。");
-        return;
-      }
-    
-      const div = document.createElement("div");
-      div.className = "item-row";
-      div.innerHTML = `
-      <div class="row-header">
-        <button type="button" class="remove-btn">－</button>
-        <label class="item-label">番目：</label>
-      </div>
-      <input type="text" class="morning-input-name" placeholder="商品名">
-      <input type="text" class="morning-input-ingredient" placeholder="成分名（任意）">
-    `;
-    
-      morningInputs.appendChild(div);
-    
-      updateListeners();
-      renumberItems('#morning-inputs');
-    });
-    
-    
-    function renumberItems(parentSelector) {
-      const container = document.querySelector(parentSelector);
-      if (!container) return;
-    
-      const rows = container.querySelectorAll('.item-row');
-      rows.forEach((row, index) => {
-        const label = row.querySelector('label');
-        if (label) {
-          label.textContent = `${index + 1}番目：`;
+    if (addMorningBtn) {
+      addMorningBtn.addEventListener("click", function () {
+        if (morningContainer.querySelectorAll('.item-row').length >= 10) {
+          alert("朝は最大10件まで追加できます。");
+          return;
         }
+        const div = document.createElement("div");
+        div.className = "item-row";
+        div.innerHTML = `
+          <div class="row-header">
+            <button type="button" class="remove-btn">－</button>
+            <label class="item-label">番目：</label>
+          </div>
+          <input type="text" class="morning-input-name" placeholder="商品名">
+          <input type="text" class="morning-input-ingredient" placeholder="成分名（任意）">
+        `;
+        morningContainer.appendChild(div);
+        updateListeners();
+        renumberItems("#morning-inputs");
       });
     }
-    
-
-
   
     // ✅ 夜アイテム追加・削除
-    let nightCount = 6;
-    const nightInputs = document.getElementById("night-inputs");
+    const nightContainer = document.getElementById("night-inputs");
     const addNightBtn = document.getElementById("add-night-item");
-  
-    addNightBtn.addEventListener("click", function () {
-      const currentRows = nightInputs.querySelectorAll('.item-row').length;
-    
-      if (currentRows >= 10) {
-        alert("夜は最大10件まで追加できます。");
-        return;
-      }
-    
-      const div = document.createElement("div");
-      div.className = "item-row";
-      div.innerHTML = `
-      <div class="row-header">
-        <button type="button" class="remove-btn">－</button>
-        <label class="item-label">番目：</label>
-      </div>
-      <input type="text" class="night-input-name" placeholder="商品名">
-      <input type="text" class="night-input-ingredient" placeholder="成分名（任意）">
-    `;
-    
-      nightInputs.appendChild(div);
-    
-      updateListeners();
-      renumberItems('#night-inputs');
-    });
-    
-    
-
-    function renumberItems(parentSelector) {
-      const container = document.querySelector(parentSelector);
-      if (!container) return;
-    
-      const rows = container.querySelectorAll('.item-row');
-      rows.forEach((row, index) => {
-        const label = row.querySelector('label');
-        if (label) {
-          label.textContent = `${index + 1}番目：`;
+    if (addNightBtn) {
+      addNightBtn.addEventListener("click", function () {
+        if (nightContainer.querySelectorAll('.item-row').length >= 10) {
+          alert("夜は最大10件まで追加できます。");
+          return;
         }
+        const div = document.createElement("div");
+        div.className = "item-row";
+        div.innerHTML = `
+          <div class="row-header">
+            <button type="button" class="remove-btn">－</button>
+            <label class="item-label">番目：</label>
+          </div>
+          <input type="text" class="night-input-name" placeholder="商品名">
+          <input type="text" class="night-input-ingredient" placeholder="成分名（任意）">
+        `;
+        nightContainer.appendChild(div);
+        updateListeners();
+        renumberItems("#night-inputs");
       });
     }
   
-    // ✅ 削除ボタン動作
+    // ✅ 番号振り直し
+    function renumberItems(parentSelector) {
+      const container = document.querySelector(parentSelector);
+      if (!container) return;
+      const rows = container.querySelectorAll('.item-row');
+      rows.forEach((row, index) => {
+        const label = row.querySelector('label');
+        if (label) label.textContent = `${index + 1}番目：`;
+      });
+    }
+  
+    // ✅ 削除ボタン処理
     function updateListeners() {
       document.querySelectorAll('.remove-btn').forEach(btn => {
         btn.onclick = () => {
           const row = btn.closest('.item-row');
           if (row) row.remove();
-          renumberItems('#morning-inputs'); // 朝の番号振り直し
-          renumberItems('#night-inputs');   // 夜の番号振り直し
+          renumberItems("#morning-inputs");
+          renumberItems("#night-inputs");
         };
       });
     }
-    
   
-    // ✅ 朝・夜の入力値をhiddenに反映（既存の処理）
-    function updateInputs(inputClass, targetId) {
-      const values = Array.from(document.querySelectorAll('.' + inputClass))
-                          .map(input => input.value.trim())
-                          .filter(v => v);
+    // ✅ 朝と夜の商品名だけ hidden に保存するバージョン
+    function updateSimpleInputs(parentSelector, inputClass, targetId) {
+      const rows = document.querySelectorAll(`${parentSelector} .item-row`);
+      const names = Array.from(rows)
+        .map(row => row.querySelector(`.${inputClass}`)?.value.trim())
+        .filter(name => !!name);
       const hiddenInput = document.getElementById(targetId);
-      if (hiddenInput) {
-        hiddenInput.value = values.join(', ');
-      }
+      if (hiddenInput) hiddenInput.value = names.join(', ');
     }
-  
-    document.addEventListener('input', () => {
-      updateInputs('morning-input-name', '{{ form.morning_items.id_for_label }}');
-      updateInputs('night-input-name', '{{ form.night_items.id_for_label }}');
-    });
-  });
-  </script>
-  
-  
 
+    // 入力イベント時に hidden に保存
+    document.addEventListener('input', () => {
+      updateSimpleInputs('#morning-inputs', 'morning-input-name', '{{ form.morning_items.id_for_label }}');
+      updateSimpleInputs('#night-inputs', 'night-input-name', '{{ form.night_items.id_for_label }}');
+    });
+
+
+
+  </script>
 
 <p style="text-align:center;"><a href="{% url 'home' %}">← ホームに戻る</a></p>
 
