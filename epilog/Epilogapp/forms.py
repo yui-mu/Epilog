@@ -38,8 +38,15 @@ class SkincareRecordForm(forms.ModelForm):
     )
 
     def __init__(self, *args, **kwargs):
+        initial = kwargs.get('initial', {})
         super().__init__(*args, **kwargs)
         self.fields['record_date'].widget.attrs['readonly'] = True
+
+        # ✅ ここで明示的に初期値を設定
+        if 'morning_items' in initial:
+            self.fields['morning_items'].initial = initial['morning_items']
+        if 'night_items' in initial:
+            self.fields['night_items'].initial = initial['night_items']
 
     def save(self, commit=True):
         instance = super().save(commit=False)
@@ -57,7 +64,7 @@ class SkincareRecordForm(forms.ModelForm):
         model = SkincareRecord
         fields = [
             'record_date', 'photo', 'skin_condition',
-            'morning_items', 'night_items',
+            'morning_items', 'night_items','ingredients',
             'skin_rating', 'concerns'
         ]
         widgets = {

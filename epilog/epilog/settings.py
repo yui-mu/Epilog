@@ -98,7 +98,7 @@ AUTH_PASSWORD_VALIDATORS = [
         'NAME': 'django.contrib.auth.password_validation.NumericPasswordValidator',
     },
     {
-        'NAME': 'Epilogapp.validators.validate_password_contains_letters_and_numbers',
+        'NAME': 'Epilogapp.validators.LettersAndNumbersValidator',
     },
 ]
 

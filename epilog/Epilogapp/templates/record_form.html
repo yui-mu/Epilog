@@ -241,11 +241,7 @@
 
 <div class="record-container">
   <h1 class="page-title" style="text-align:center;">スキンケア記録フォーム</h1>
-  <form method="post" enctype="multipart/form-data"
-    onsubmit="
-      updateInputs('#morning-inputs', 'morning-input-name', 'morning-select-type', '{{ form.morning_items.id_for_label }}');
-      updateInputs('#night-inputs', 'night-input-name', 'night-select-type', '{{ form.night_items.id_for_label }}');
-    ">
+  <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
     {% if form.errors %}
@@ -338,7 +334,7 @@
           {% endfor %}
         </div>        
         <button type="button" id="add-morning-item">＋項目を追加する</button>
-        {{ form.morning_items.as_hidden }}
+        
       </div>
     
       <!-- 夜 -->
@@ -364,12 +360,12 @@
                 <option value="その他">その他</option>
               </select>
               <input type="text" class="night-input-name" placeholder="商品名">
-              <input type="text" class="night--input-ingredient" placeholder="成分名（任意）">
+              <input type="text" class="night-input-ingredient" placeholder="成分名（任意）">
             </div>
           {% endfor %}
         </div>
         <button type="button" id="add-night-item">＋項目を追加する</button>
-        {{ form.night_items.as_hidden }}
+        
       </div>
     </div>
 
@@ -432,18 +428,21 @@
       const items = csvStr.split(',')
         .map(s => s.trim())
         .filter(Boolean)
-        .filter(s => s.includes(':')); // カテゴリ:商品名の形式のみ
+        .filter(s => s.split(':').length >= 2); 
       return items.slice(0, maxItems);
     }
     
     const morningRaw = "{{ form.morning_items.value|escapejs }}";
+    console.log("morningRaw:", morningRaw);
     const nightRaw = "{{ form.night_items.value|escapejs }}";
     
     const morningCsv = extractItemsFromCsv(morningRaw, 6).join(',');
     const nightCsv = extractItemsFromCsv(nightRaw, 6).join(',');
     
-    populateSimpleInputs(morningCsv, "morning-inputs", "morning-input-name");
-    populateSimpleInputs(nightCsv, "night-inputs", "night-input-name");
+    // ✅ 初期化呼び出し（6件まで）
+    populateSimpleInputs("{{ form.morning_items.value|escapejs }}", "morning-inputs", "morning-input-name", 6);
+    populateSimpleInputs("{{ form.night_items.value|escapejs }}", "night-inputs", "night-input-name", 6);
+
     
   
     // ✅ 編集時の初期商品名の表示（朝・夜）1～6件目まで表示
@@ -455,7 +454,19 @@
       items.forEach((item, index) => {
         if (!item) return;
 
-        const [category, name] = item.includes(':') ? item.split(':', 2) : ['未分類', item];
+        const parts = item.split(':');
+        let category = '';
+        let name = '';
+        let ingredient = '';
+
+        if (parts.length === 3) {
+          [category, name, ingredient] = parts;
+        } else if (parts.length === 2) {
+          [category, name] = parts;
+        } else {
+          name = parts[0];  // ← 商品名だけの場合にも対応！
+        }
+        
         if (index >= maxInitial) return;  // ✅ 7件目以降は非表示
 
         const div = document.createElement("div");
@@ -478,7 +489,7 @@
             <option value="その他" ${category === "その他" ? "selected" : ""}>その他</option>
           </select>
           <input type="text" class="${inputClass}" value="${name}" placeholder="商品名">
-          <input type="text" class="${inputClass}-ingredient" placeholder="成分名（任意）">
+          <input type="text" class="${inputClass}-ingredient" value="${ingredient}" placeholder="成分名（任意）">
         `;
         container.appendChild(div);
       });
@@ -524,6 +535,7 @@
         morningInputs.appendChild(div);
         updateListeners();
         renumberItems('#morning-inputs');
+        bindInputEvents();
       });
     }
 
@@ -560,6 +572,7 @@
         nightInputs.appendChild(div);
         updateListeners();
         renumberItems('#night-inputs');
+        bindInputEvents();
       });
     }
 
@@ -587,25 +600,57 @@
 
   
     // ✅ hiddenに反映（保存用）
-    function updateSimpleInputs(parentSelector, inputClass, targetId) {
+    function updateSimpleInputs(parentSelector, prefix, targetId) {
       const rows = document.querySelectorAll(`${parentSelector} .item-row`);
-      const names = Array.from(rows)
-        .map(row => row.querySelector(`.${inputClass}`)?.value.trim())
-        .filter(name => !!name);
+      const items = Array.from(rows).map(row => {
+        const category = row.querySelector(`.${prefix}-select-type`)?.value.trim() || '';
+        const name = row.querySelector(`.${prefix}-input-name`)?.value.trim() || '';
+        const ingredient = row.querySelector(`.${prefix}-input-ingredient`)?.value.trim() || '';
+        return `${category}:${name}:${ingredient}`;
+      }).filter(item => item !== '::');
       const hiddenInput = document.getElementById(targetId);
-      if (hiddenInput) hiddenInput.value = names.join(', ');
+      if (hiddenInput) hiddenInput.value = items.join(', ');
     }
-  
-    document.addEventListener('input', () => {
-      updateSimpleInputs('#morning-inputs', 'morning-input-name', '{{ form.morning_items.id_for_label }}');
-      updateSimpleInputs('#night-inputs', 'night-input-name', '{{ form.night_items.id_for_label }}');
-    });
-  
+    
+    
+    // ✅ 入力欄の変更イベント → hidden に反映
+    function bindInputEvents() {
+      document.querySelectorAll('.morning-select-type, .morning-input-name, .morning-input-ingredient').forEach(el => {
+        el.addEventListener('input', () => {
+          updateSimpleInputs('#morning-inputs', 'morning', 'id_morning_items');
+        });
+      });
+
+      document.querySelectorAll('.night-select-type, .night-input-name, .night-input-ingredient').forEach(el => {
+        el.addEventListener('input', () => {
+          updateSimpleInputs('#night-inputs', 'night', 'id_night_items');
+        });
+      });
+    }
+    
+    // ✅ 初期呼び出し
     updateListeners();
     renumberItems('#morning-inputs');
     renumberItems('#night-inputs');
-  
+    bindInputEvents();
+
+    // ✅ フォーム送信直前にもhiddenを更新
+    document.querySelector('form').addEventListener('submit', function () {
+      updateSimpleInputs('#morning-inputs', 'morning', 'id_morning_items');
+      updateSimpleInputs('#night-inputs', 'night', 'id_night_items');
+
+        // デバッグ出力（必須）
+      console.log("💾 morning_items 保存前:", document.getElementById('id_morning_items').value);
+      console.log("💾 night_items 保存前:", document.getElementById('id_night_items').value);
+
+    });
+
+
 });
+
+    
+
+
 </script>
   
   

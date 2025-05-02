@@ -24,7 +24,7 @@
   {% if morning_list %}
     <ol>
       {% for item in morning_list %}
-        <li>{{ item.name }}</li>
+        <li>{{ item.category }}：{{ item.name }}{% if item.ingredient %}（成分：{{ item.ingredient }}）{% endif %}</li>
       {% endfor %}
     </ol>
   {% else %}
@@ -35,7 +35,7 @@
   {% if night_list %}
     <ol>
       {% for item in night_list %}
-        <li>{{ item.name }}</li>
+      <li>{{ item.category }}：{{ item.name }}{% if item.ingredient %}（成分：{{ item.ingredient }}）{% endif %}</li>
       {% endfor %}
     </ol>
   {% else %}

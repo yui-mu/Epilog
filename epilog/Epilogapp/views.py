@@ -1,6 +1,9 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.views.generic import TemplateView
+from django.contrib.auth.views import PasswordResetView
+from django.urls import reverse_lazy
 from django.http import JsonResponse, HttpResponseRedirect
 from django.db.models import Q
 from django.utils import timezone
@@ -52,6 +55,22 @@ def email_login_view(request):
         form = EmailLoginForm()
     return render(request, 'registration/login.html', {'form': form})
 
+class CustomPasswordResetView(PasswordResetView):
+    template_name = 'registration/password_reset_form.html'
+    success_url = reverse_lazy('password_reset_done')
+
+    def form_valid(self, form):
+        # メールアドレスをセッションに保存
+        self.request.session['reset_email'] = form.cleaned_data['email']
+        return super().form_valid(form)
+
+class CustomPasswordResetDoneView(TemplateView):
+    template_name = 'registration/password_reset_done.html'
+
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['email'] = self.request.session.get('reset_email', 'ご登録のメールアドレス')
+        return context
 
 @login_required
 def home_view(request):
@@ -142,9 +161,14 @@ def record_edit_view(request, pk):
             record.save()
             return redirect('record_detail', pk=record.pk)
     else:
-        form = SkincareRecordForm(instance=record)
+        form = SkincareRecordForm(instance=record, initial={
+        'morning_items': record.morning_items,
+        'night_items': record.night_items,
+        })
 
-    return render(request, 'record_form.html', {'form': form})
+    return render(request, 'record_form.html', {
+        'form': form,
+    })
 
 
                    
@@ -183,11 +207,15 @@ def record_detail_view(request, pk):
             item = item.strip()
             if not item:
                 continue
-            if ':' in item:
-                category, name = item.split(':', 1)
-            else:
-                category, name = '未分類', item
-            result.append({'category': category.strip(), 'name': name.strip()})
+            parts = item.split(':')
+            category = parts[0] if len(parts) > 0 else "未分類"
+            name = parts[1] if len(parts) > 1 else ""
+            ingredient = parts[2] if len(parts) > 2 else ""
+            result.append({
+                'category': category.strip(),
+                'name': name.strip(),
+                'ingredient': ingredient.strip(),
+            })
         return result
 
 
