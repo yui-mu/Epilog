@@ -588,7 +588,7 @@ def advisor_active_chats(request, session_id=None):
                     receiver=selected_session.user,
                     content=content
                 )
-                return redirect(f"{reverse('advisor_chat_dashboard_with_session', args=[session_id])}")
+                return redirect(f"{reverse('advisor_active_chats')}?session_id={session_id}")
 
     return render(request, 'advisor/chat_dashboard.html', {
         'active_sessions': active_sessions,

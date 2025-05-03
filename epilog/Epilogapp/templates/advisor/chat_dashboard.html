@@ -43,11 +43,11 @@
       </div>
 
       <!-- メッセージ送信フォーム -->
-      <form method="post">
+      <<form method="post" action="">
         {% csrf_token %}
         <textarea name="content" rows="3" cols="60" placeholder="メッセージを入力..." style="width: 100%; padding: 10px; border-radius: 5px;"></textarea><br>
         <button type="submit" style="margin-top: 10px;">送信</button>
-      </form>
+      </form>      
 
       <!-- 終了ボタン -->
       <form method="post" action="{% url 'chat_session_complete' selected_session.id %}" style="margin-top: 10px;">
