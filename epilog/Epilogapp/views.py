@@ -5,6 +5,7 @@ from django.views.decorators.http import require_http_methods
 from django.views.generic import TemplateView
 from django.contrib.auth.views import PasswordResetView
 from django.urls import reverse_lazy
+from django.urls import reverse
 from django.http import JsonResponse, HttpResponseRedirect
 from django.db.models import Q
 from django.utils import timezone
@@ -560,15 +561,42 @@ def advisor_start_chat(request, session_id):
     session.status = 'active'
     session.started_at = timezone.now()
     session.save()
-    return redirect('advisor_active_chats')  # ※このURLは後で作る「対応中」一覧ページ
+    return redirect(f"{reverse('advisor_active_chats')}?session_id={session.id}")
+ 
 
 @login_required
-def advisor_active_chats(request):
-    sessions = ChatSession.objects.filter(
+def advisor_active_chats(request, session_id=None):
+    active_sessions = ChatSession.objects.filter(
         advisor=request.user,
         status='active'
     ).order_by('-started_at')
-    return render(request, 'advisor/active_chats.html', {'sessions': sessions})
+
+    selected_session = None
+    messages = []
+    session_id = request.GET.get('session_id')
+
+    if session_id:
+        selected_session = get_object_or_404(ChatSession, id=session_id, advisor=request.user)
+        messages = selected_session.messages.order_by('timestamp')
+
+        if request.method == 'POST':
+            content = request.POST.get('content')
+            if content:
+                Message.objects.create(
+                    session=selected_session,
+                    sender=request.user,
+                    receiver=selected_session.user,
+                    content=content
+                )
+                return redirect(f"{reverse('advisor_chat_dashboard_with_session', args=[session_id])}")
+
+    return render(request, 'advisor/chat_dashboard.html', {
+        'active_sessions': active_sessions,
+        'selected_session': selected_session,
+        'messages': messages,
+    })
+
+
 
 @login_required
 @require_http_methods(["GET", "POST"])
@@ -646,3 +674,41 @@ def edit_advisor_profile_view(request):
         form = AdvisorProfileForm(instance=user)
 
     return render(request, 'advisor/edit_profile.html', {'form': form})
+
+@login_required
+def chat_dashboard_view(request, session_id=None):
+    if not request.user.is_advisor:
+        return redirect('top')  # ユーザーならトップページへ
+
+    # このアドバイザーが対応中のセッション
+    active_sessions = ChatSession.objects.filter(
+        advisor=request.user,
+        status='active'
+    ).order_by('-started_at')
+
+    selected_session = None
+    messages = None
+
+    # チャットが選択されている場合、そのメッセージを取得
+    if session_id:
+        selected_session = get_object_or_404(ChatSession, id=session_id, advisor=request.user)
+        messages = selected_session.messages.order_by('timestamp')
+
+        # メッセージ送信処理
+        if request.method == 'POST':
+            content = request.POST.get('content')
+            if content:
+                Message.objects.create(
+                    session=selected_session,
+                    sender=request.user,
+                    receiver=selected_session.user,
+                    content=content
+                )
+            return redirect('advisor_chat_dashboard_with_session', session_id=session_id)
+
+    return render(request, 'advisor/chat_dashboard.html', {
+        'active_sessions': active_sessions,
+        'selected_session': selected_session,
+        'messages': messages,
+    })
+

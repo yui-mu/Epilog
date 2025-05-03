@@ -7,11 +7,13 @@
   {% for session in sessions %}
     <li>
       {{ session.user.username }} さん（{{ session.ended_at|date:"Y-m-d H:i" }} 終了）
+      - <a href="{% url 'advisor_active_chats' %}?session_id={{ session.id }}">詳細</a>
     </li>
   {% empty %}
-    <li>対応済のチャットはありません。</li>
+    <li>対応済みのチャットはありません。</li>
   {% endfor %}
 </ul>
+
 
 <a href="{% url 'advisor_active_chats' %}">← チャット対応中へ戻る</a>
 {% endblock %}
