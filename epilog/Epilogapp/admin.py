@@ -3,6 +3,7 @@ from .models import Product, Ingredient, Concern, Favorite, Message, SkinType
 from django.contrib.auth.admin import UserAdmin
 from .models import CustomUser
 from .models import SkincareRecord
+from .models import ChatSession
 
 class CustomUserAdmin(UserAdmin):
     model = CustomUser
@@ -18,4 +19,5 @@ admin.site.register(Favorite)
 admin.site.register(Message)
 admin.site.register(CustomUser, CustomUserAdmin)
 admin.site.register(SkincareRecord)
+admin.site.register(ChatSession)
 # Register your models here.

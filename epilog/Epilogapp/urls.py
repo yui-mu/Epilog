@@ -88,7 +88,7 @@ urlpatterns = [
     path('advisor/session/<int:session_id>/complete/', views.chat_session_complete, name='chat_session_complete'),
     path('advisor/completed/', views.advisor_completed_chats, name='advisor_completed_chats'),
     path('advisor/profile/', views.advisor_profile_view, name='advisor_profile'),
-
+    path('advisor/profile/edit/', views.edit_advisor_profile_view, name='edit_advisor_profile'),
 
 
 ]

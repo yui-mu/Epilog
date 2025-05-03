@@ -159,3 +159,14 @@ class EmailLoginForm(forms.Form):
         'class': 'form-control',
         'placeholder': 'パスワードを入力'
     }))
+    
+class AdvisorProfileForm(forms.ModelForm):
+    class Meta:
+        model = CustomUser
+        fields = [
+            'nickname',
+            'profile_photo',
+            'expertise',         
+            'certification',     
+            'available_time',
+        ]

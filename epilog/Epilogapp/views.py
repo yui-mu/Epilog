@@ -22,6 +22,7 @@ from .forms import (
     UserEditForm,
     EditAccountForm,
     EmailLoginForm,
+    AdvisorProfileForm
     )
 from .models import (
     SkincareRecord, Product, 
@@ -77,10 +78,14 @@ class CustomPasswordResetDoneView(TemplateView):
 
 @login_required
 def home_view(request):
-    if request.user.is_advisor:
-        return render(request, 'advisor/home.html')
+    print("=== home_view が呼ばれました ===")
+    print("is_advisor =", request.user.is_advisor)
+    user = request.user
+    if user.is_advisor:
+        return render(request, 'advisor/home.html')  # アドバイザー用テンプレートを使用
     else:
-        return render(request, 'home.html')
+        return render(request, 'home.html')  # ユーザー用テンプレート
+
 
 def top_view(request):
     return render(request, 'top.html')
@@ -347,8 +352,19 @@ def chat_view(request):
                 except CustomUser.DoesNotExist:
                     pass  # 無効なユーザーIDだった場合
             else:
+            # ユーザーが送信する場合、ChatSessionを取得 or 作成して紐づける！
                 if advisor:
-                    Message.objects.create(sender=user, receiver=advisor, content=content)
+                    session, created = ChatSession.objects.get_or_create(
+                        user=user,
+                        advisor=advisor,
+                        defaults={'status': 'unassigned'}
+                    )
+                    Message.objects.create(
+                        session=session,
+                        sender=user,
+                        receiver=advisor,
+                        content=content
+                    )
         return redirect('chat')
 
     # アドバイザー用：全ユーザー一覧を渡す
@@ -415,7 +431,12 @@ def chat_with_user_view(request, user_id):
 @login_required
 def advisor_unassigned_list(request):
     sessions = ChatSession.objects.filter(status='unassigned').order_by('-created_at')
+    print("取得された未対応セッション:", sessions)
+    for session in sessions:
+        session.latest_message = session.messages.order_by('-timestamp').first()
+        print("ユーザー:", session.user, "最新メッセージ:", session.latest_message)
     return render(request, 'advisor/unassigned_list.html', {'sessions': sessions})
+
 
 @login_required
 def user_skincare_record_list_view(request, user_id):
@@ -601,6 +622,27 @@ def advisor_completed_chats(request):
 
 @login_required
 def advisor_profile_view(request):
+    user = request.user
+    expertise_list = user.expertise.split(',') if user.expertise else []
     return render(request, 'advisor/profile.html', {
-        'user': request.user
+        'user': user,
+        'expertise_list': expertise_list,
     })
+
+
+@login_required
+def edit_advisor_profile_view(request):
+    if not request.user.is_advisor:
+        return redirect('home')
+
+    user = request.user
+    if request.method == 'POST':
+        form = AdvisorProfileForm(request.POST, request.FILES, instance=user)
+        if form.is_valid():
+            form.save()
+            messages.success(request, 'プロフィールを更新しました。')
+            return redirect('advisor_profile')
+    else:
+        form = AdvisorProfileForm(instance=user)
+
+    return render(request, 'advisor/edit_profile.html', {'form': form})

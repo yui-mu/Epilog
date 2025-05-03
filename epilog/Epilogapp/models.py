@@ -39,10 +39,19 @@ class CustomUser(AbstractUser):
     created_at = models.DateTimeField("作成日時", auto_now_add=True)
     updated_at = models.DateTimeField("更新日時", auto_now=True)
     
+    EXPERTISE_CHOICES = [
+        ('type', '肌タイプ別の専門分野'),
+        ('concern', '肌悩み別の専門分野'),
+        ('method', 'スキンケア手順・方法に関する専門分野'),
+        ('ingredient', '成分に関する専門分野'),
+    ]
+    expertise = models.CharField("専門分野", max_length=255, blank=True, help_text="カンマ区切りで保存")
+
+    certification = models.CharField("資格", max_length=255, blank=True)
+    available_time = models.CharField("対応可能時間", max_length=64, blank=True)
     
     USERNAME_FIELD = 'email'  # ← これで「email」でログインするようになる
     REQUIRED_FIELDS = ['username']  # 管理コマンド用に必要なフィールド
-
 
 
     def __str__(self):
