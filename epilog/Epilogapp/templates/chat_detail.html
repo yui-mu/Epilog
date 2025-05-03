@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<h2 class="page-title">チャット履歴</h2>
+
+<!-- セッション情報 -->
+<div style="margin-bottom: 20px;">
+    <strong>相談者:</strong> {{ session.user.username }}<br>
+    <strong>アドバイザー:</strong> {{ session.advisor.username }}<br>
+    <strong>開始日:</strong> {{ session.started_at|date:"Y年m月d日 H:i" }}<br>
+    {% if session.ended_at %}
+        <strong>終了日:</strong> {{ session.ended_at|date:"Y年m月d日 H:i" }}
+    {% endif %}
+</div>
+
+<!-- メッセージエリア -->
+<div style="border: 1px solid #ccc; padding: 15px; border-radius: 8px; background-color: #f9f9f9;">
+    {% for msg in messages %}
+        <div style="margin-bottom: 10px;
+                    text-align: {% if msg.sender == request.user %}right{% else %}left{% endif %};">
+            <div style="display: inline-block;
+                        padding: 10px;
+                        border-radius: 12px;
+                        background-color: {% if msg.sender == request.user %}#d1f0d1{% else %}#e0e0e0{% endif %};">
+                <strong>{{ msg.sender.username }}</strong><br>
+                {{ msg.content }}<br>
+                <small>{{ msg.timestamp|date:"Y年m月d日 H:i" }}</small>
+            </div>
+        </div>
+    {% empty %}
+        <p>このチャットにはメッセージがありません。</p>
+    {% endfor %}
+</div>
+
+<!-- 戻るボタン -->
+<div style="margin-top: 20px;">
+    <a href="{% url 'chat' %}" class="btn btn-secondary">← チャット一覧へ戻る</a>
+</div>
+
+{% endblock %}

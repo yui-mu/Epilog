@@ -1,26 +1,59 @@
 {% extends 'base.html' %}
 {% block content %}
+
 <h1 class="page-title">チャット相談</h1>
 
+<!-- 横並びレイアウト -->
+<div class="chat-container" style="display: flex; justify-content: space-between;">
+
+  <!-- 左カラム：履歴一覧 -->
+  <div class="chat-history" style="width: 30%; padding-right: 20px; border-right: 1px solid #ccc;">
+    <h3>履歴一覧</h3>
+    <ul>
+      {% for session in chat_sessions %}
+        <li style="margin-bottom: 8px;">
+          <a href="{% url 'chat_detail' session.id %}">
+            {{ session.created_at|date:"Y年m月d日" }}
+          </a>
+        </li>
+      {% empty %}
+        <li>履歴はまだありません。</li>
+      {% endfor %}
+    </ul>
+  </div>
+
+  <!-- 右カラム：チャット内容 -->
+  <div class="chat-main" style="width: 65%;">
     <div style="border:1px solid #ccc; padding:10px; height:300px; overflow-y:scroll; margin-bottom:20px;">
-        {% for msg in messages %}
-            <p><strong>{{ msg.sender.username }}</strong>: {{ msg.content }} <br><small>{{ msg.timestamp }}</small></p>
-        {% endfor %}
+      {% for msg in messages %}
+        <p><strong>{{ msg.sender.username }}</strong>: {{ msg.content }}<br><small>{{ msg.timestamp }}</small></p>
+      {% endfor %}
     </div>
 
     <form method="post">
-        {% csrf_token %}
-    
-        {% if user_list %}
-            <label for="receiver">送信先ユーザー:</label>
-            <select name="receiver">
-                {% for u in user_list %}
-                    <option value="{{ u.id }}">{{ u.username }}</option>
-                {% endfor %}
-            </select><br>
-        {% endif %}
-    
-        <textarea name="content" rows="3" cols="40" placeholder="メッセージを入力..."></textarea><br>
-        <button type="submit">送信</button>
+      {% csrf_token %}
+
+      {% if user_list %}
+        <label for="receiver">送信先ユーザー:</label>
+        <select name="receiver">
+          {% for u in user_list %}
+            <option value="{{ u.id }}">{{ u.username }}</option>
+          {% endfor %}
+        </select><br>
+      {% endif %}
+
+      <textarea name="content" rows="3" cols="40" placeholder="メッセージを入力..."></textarea><br>
+      <button type="submit">送信</button>
     </form>
+
+    <!-- チャット終了ボタン -->
+    <form method="post" action="{% url 'chat_end' %}">
+      {% csrf_token %}
+      <button type="submit" style="margin-top:10px; background-color: #ccc;">終了</button>
+    </form>
+  </div>
+
+</div>
+
 {% endblock %}
+

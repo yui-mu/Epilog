@@ -370,11 +370,36 @@ def chat_view(request):
 
     # アドバイザー用：全ユーザー一覧を渡す
     user_list = CustomUser.objects.filter(is_advisor=False) if user.is_advisor else None
+    
+    if user.is_advisor:
+        chat_sessions = ChatSession.objects.filter(user=user).order_by('-created_at')
+    else:
+        chat_sessions = ChatSession.objects.filter(user=user).order_by('-created_at')
 
     return render(request, 'chat.html', {
         'messages': messages,
         'user_list': user_list,
+        'chat_sessions': chat_sessions,
     })
+    
+@login_required
+def chat_detail(request, session_id):
+    session = get_object_or_404(ChatSession, id=session_id)
+
+    # セッションに関連するメッセージを取得
+    messages = Message.objects.filter(session=session).order_by('timestamp')
+
+    return render(request, 'chat_detail.html', {
+        'session': session,
+        'messages': messages,
+    })
+
+@login_required
+def chat_end(request):
+    if request.method == 'POST':
+        # 終了処理（例：フラグ保存、チャット画面からリダイレクト）
+        return redirect('home')  # ホーム画面などへ
+
 
 @login_required
 def chat_user_list_view(request):
