@@ -1,0 +1,28 @@
+{% extends "advisor/advisor_base.html" %}
+
+{% block content %}
+<h2>{{ target_user.username }}さんのスキンケア記録一覧</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>記録日</th>
+      <th>肌の状態</th>
+      <th>使用アイテム（朝）</th>
+      <th>使用アイテム（夜）</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for record in records %}
+    <tr>
+      <td>{{ record.record_date }}</td>
+      <td>{{ record.skin_score }}点</td>
+      <td>{{ record.morning_items }}</td>
+      <td>{{ record.night_items }}</td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">記録がありません。</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}
