@@ -125,6 +125,13 @@ class Favorite(models.Model):
         return f"{self.user.username} ❤️ {self.product.name}"
     
 class Message(models.Model):
+    session = models.ForeignKey(
+        'ChatSession', 
+        on_delete=models.CASCADE, 
+        related_name='messages',
+        null=True,  
+        blank=True  
+    )
     sender = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
     receiver = models.ForeignKey(
     settings.AUTH_USER_MODEL,
@@ -137,6 +144,37 @@ class Message(models.Model):
 
     def __str__(self):
         return f"{self.sender.username}: {self.content[:20]}"
+    
+class ChatSession(models.Model):
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='user_sessions'
+    )
+    advisor = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name='advisor_sessions',
+        null=True, blank=True  # 未対応状態ではアドバイザー未設定
+    )
+    
+    STATUS_CHOICES = [
+        ('unassigned', '未対応'),
+        ('active', '対応中'),
+        ('completed', '対応済'),
+    ]
+    status = models.CharField(
+        max_length=20,
+        choices=STATUS_CHOICES,
+        default='unassigned'
+    )
+
+    created_at = models.DateTimeField(auto_now_add=True)  # セッション作成日
+    started_at = models.DateTimeField(null=True, blank=True)  # アドバイザーが対応開始した時間
+    ended_at = models.DateTimeField(null=True, blank=True)  # 対応終了時刻（任意）
+
+    def __str__(self):
+        return f"Session with {self.user.username} - {self.status}"
 
 
 

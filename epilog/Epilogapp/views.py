@@ -20,6 +20,7 @@ from .forms import (
     UserEditForm,
     EditAccountForm,
     EmailLoginForm,
+    ChatSession
     
     )
 from .models import SkincareRecord, Product, Favorite, Message, CustomUser, SKIN_CONCERN_CHOICES
@@ -405,6 +406,11 @@ def chat_with_user_view(request, user_id):
         'chat_user': chat_user,
         'messages': messages,
     })
+    
+@login_required
+def advisor_unassigned_list(request):
+    sessions = ChatSession.objects.filter(status='unassigned').order_by('-created_at')
+    return render(request, 'advisor/unassigned_list.html', {'sessions': sessions})
 
 @login_required
 def user_skincare_record_list_view(request, user_id):

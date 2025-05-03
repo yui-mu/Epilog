@@ -72,26 +72,55 @@
     list-style: none;
     padding: 0;
     margin: 0 auto;
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
-    justify-content: center;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* ★ 3列対応 */
+    gap: 20px; /* ★ 各カードの間に余白を設定 */
     max-width: 1000px;
   }
+  
 
   .product-card {
     width: 250px;
     padding: 15px;
+    margin: 20px 0;
     border: 1px solid #ccc;
     border-radius: 10px;
     text-align: center;
     background-color: #fff;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
+    display: flex; /* 内部要素の位置を調整しやすくする */
+    flex-direction: column; /* 内部要素を縦並びにする */
+    align-items: center;
+    position: relative;
   }
 
   .product-card img {
     width: 100%;
     height: 200px;
+    object-fit: contain;
+    border-radius: 8px;
+  }
+
+  .product-card h3 {
+    font-size: 16px;
+    margin: 10px 0 5px 0;
+  }
+  
+  .product-card p {
+    font-size: 14px;
+    margin: 0 0 10px 0;
+  }
+  
+
+  .image-wrapper {
+    position: relative;
+    width: 100%;
+    overflow: hidden; /* ★ はみ出る部分を隠す */
+  }
+  
+  .image-wrapper img {
+    width: 100%;
+    height: 100%;
     object-fit: contain;
     border-radius: 8px;
   }
@@ -102,6 +131,9 @@
     background: none;
     color: gray;
     cursor: pointer;
+    position: absolute; /* ★絶対位置を指定（これを追加） */
+    bottom: 8px;       /* ★画像内の下位置（調整可能） */
+    right: 8px;        /* ★画像内の右位置（調整可能） */
   }
 
   .favorite-btn.added {
@@ -135,20 +167,23 @@
     </form>
   </div>
 
+  <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
+
   <h2 class="results-title">検索結果</h2>
 
   {% if products %}
     <ul class="product-grid">
       {% for product in products %}
         <li class="product-card">
-          <img src="{{ product.image.url }}" alt="{{ product.name }}">
+          <div class="image-wrapper">
+            <img src="{{ product.image.url }}" alt="{{ product.name }}">
+            <button class="favorite-btn {% if product.id in favorite_ids %}added{% endif %}"
+                    data-product-id="{{ product.id }}">
+              {% if product.id in favorite_ids %}❤{% else %}♥{% endif %}
+            </button>
+          </div>
           <h3>{{ product.name }}</h3>
           <p>{{ product.description }}</p>
-
-          <button class="favorite-btn {% if product.id in favorite_ids %}added{% endif %}"
-                  data-product-id="{{ product.id }}">
-            ❤
-          </button>
         </li>
       {% endfor %}
     </ul>
@@ -158,31 +193,36 @@
 </div>
 
 <script>
-document.addEventListener('DOMContentLoaded', function () {
-  const buttons = document.querySelectorAll('.favorite-btn');
-
-  buttons.forEach(button => {
-    button.addEventListener('click', function () {
-      const productId = this.dataset.productId;
-
-      fetch("{% url 'toggle_favorite_ajax' %}", {
-        method: 'POST',
-        headers: {
-          'X-CSRFToken': '{{ csrf_token }}',
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: 'product_id=' + productId
-      })
-      .then(response => response.json())
-      .then(data => {
-        if (data.success) {
-          this.classList.toggle('added');
-        }
+  document.addEventListener('DOMContentLoaded', function () {
+      const buttons = document.querySelectorAll('.favorite-btn');
+  
+      buttons.forEach(button => {
+          button.addEventListener('click', function () {
+              const productId = this.dataset.productId;
+              const btn = this;
+  
+              fetch("{% url 'toggle_favorite_ajax' %}", {
+                  method: 'POST',
+                  headers: {
+                      'X-CSRFToken': '{{ csrf_token }}',
+                      'Content-Type': 'application/x-www-form-urlencoded',
+                  },
+                  body: 'product_id=' + productId
+              })
+              .then(response => response.json())
+              .then(data => {
+                  if (data.success) {
+                      btn.classList.toggle('added');
+                      btn.textContent = btn.classList.contains('added') ? '❤' : '♥';
+                  }
+              })
+              .catch(error => console.error('エラーが発生しました:', error));
+          });
       });
-    });
   });
-});
 </script>
+  
+  
 {% endblock %}
 
 
