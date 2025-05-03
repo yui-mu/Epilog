@@ -1,30 +1,58 @@
 {% extends "advisor/advisor_base.html" %}
 
 {% block content %}
-<h2>{{ session.user.username }} さんとのチャット</h2>
+<div style="display: flex; gap: 20px;">
 
-<div class="chat-box">
-    {% for msg in messages %}
-      <div style="margin-bottom: 10px; text-align: {% if msg.sender == request.user %}right{% else %}left{% endif %};">
-        <div style="display: inline-block; padding: 8px 12px; background-color: {% if msg.sender == request.user %}#d1f0ff{% else %}#f0f0f0{% endif %}; border-radius: 10px; max-width: 70%;">
-          <strong>{{ msg.sender.username }}:</strong> {{ msg.content }}
+        <!-- 左カラム：対応中ユーザー一覧 -->
+    <div style="width: 25%; border-right: 1px solid #ccc; padding-right: 10px;">
+        <h3>対応中のユーザー</h3>
+        <ul style="list-style: none; padding: 0;">
+        {% for s in active_sessions %}
+            <li style="margin-bottom: 10px;">
+            <a href="{% url 'chat_session_detail' s.id %}">
+                {{ s.user.username }}
+            </a>
+            </li>
+        {% endfor %}
+        </ul>
+    </div>
+
+
+
+    <!-- 右カラム：チャット本体 -->
+    <div style="width: 75%;">
+    <h2>{{ session.user.username }} さんとのチャット</h2>
+
+    <div class="chat-box" style="max-height: 300px; overflow-y: scroll; padding: 10px; border: 1px solid #ccc;">
+        {% for msg in messages %}
+        <div style="text-align: {% if msg.sender == request.user %}right{% else %}left{% endif %}; margin-bottom: 10px;">
+            <div style="display: inline-block; padding: 10px; border-radius: 10px;
+                        background-color: {% if msg.sender == request.user %}#e6f7ff{% else %}#f0f0f0{% endif %};
+                        max-width: 70%;">
+            <strong>{{ msg.sender.username }}</strong><br>
+            {{ msg.content }}<br>
+            <small>{{ msg.timestamp|date:"Y-m-d H:i" }}</small>
+            </div>
         </div>
-      </div>
-    {% empty %}
-      <p>まだメッセージがありません。</p>
-    {% endfor %}
+        {% empty %}
+        <p>まだメッセージがありません。</p>
+        {% endfor %}
+    </div>
+    
+    
+    <form method="post" style="margin-top: 20px;">
+        {% csrf_token %}
+        <textarea name="content" rows="3" cols="60" placeholder="メッセージを入力..."
+                style="padding: 10px; border-radius: 5px; width: 100%; margin-bottom: 10px;"></textarea>
+        <button type="submit" class="btn">送信</button>
+    </form>
+    
+    
+    <form method="post" action="{% url 'chat_session_complete' session.id %}" style="margin-top: 10px;">
+        {% csrf_token %}
+        <button type="submit" class="btn btn-secondary">チャットを終了する</button>
+    </form>
 </div>
-  
-<form method="post" style="margin-top: 20px;">
-    {% csrf_token %}
-    <textarea name="content" rows="3" cols="60" placeholder="メッセージを入力..." style="margin-bottom: 5px;"></textarea><br>
-    <button type="submit">送信</button>
-</form>
-  
-<form method="post" action="{% url 'chat_session_complete' session.id %}" style="margin-top: 10px;">
-    {% csrf_token %}
-    <button type="submit">チャットを終了する</button>
-</form>
   
 <a href="{% url 'advisor_active_chats' %}">← 一覧に戻る</a>
 {% endblock %}

@@ -356,8 +356,8 @@ def chat_view(request):
                 if advisor:
                     session, created = ChatSession.objects.get_or_create(
                         user=user,
-                        advisor=advisor,
-                        defaults={'status': 'unassigned'}
+                        status='unassigned',
+                        defaults={'advisor': advisor}
                     )
                     Message.objects.create(
                         session=session,

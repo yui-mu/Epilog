@@ -1,6 +1,23 @@
 {% extends "advisor/advisor_base.html" %}
 
 {% block content %}
+
+<style>
+    table {
+      width: 100%;
+      border-collapse: separate;
+      border-spacing: 20px 12px; /* 横20px・縦12pxの間隔 */
+    }
+    th, td {
+      text-align: left;
+      padding: 8px 10px;
+    }
+    th {
+      font-weight: bold;
+    }
+</style>
+
+
 <h2>未対応相談一覧</h2>
 
 <table>
