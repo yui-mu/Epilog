@@ -1,0 +1,59 @@
+<!-- templates/base_advisor.html -->
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <title>{% block title %}EpiLog{% endblock %}</title>
+  <style>
+    body {
+      font-family: sans-serif;
+      background-color: #f7fdf9;
+      padding: 20px;
+    }
+    nav {
+      margin-bottom: 20px;
+      background-color: #dcefe6;
+      padding: 10px;
+      border-radius: 8px;
+    }
+    nav a {
+      margin-right: 12px;
+      background-color: #b3dbc8;
+      padding: 6px 12px;
+      border-radius: 6px;
+      text-decoration: none;
+      color: #333;
+      font-weight: bold;
+    }
+    nav a:hover {
+      background-color: #98cbb7;
+    }
+    .container {
+      background-color: #ffffff;
+      padding: 20px;
+      border-radius: 12px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+    }
+  </style>
+</head>
+<body>
+  {% if user.is_authenticated %}
+    {% block navigation %}
+    <!-- advisor_base.html 側で上書きされる -->
+    {% endblock %}
+  {% endif %}
+
+  <div class="container">
+    {% if user.is_authenticated %}
+      <p style="text-align: right; font-size: 0.9em; color: #444; margin: 0 0 10px;">
+        ログイン中：<strong>{{ user.nickname }}</strong> さん
+      </p>
+    {% endif %}
+
+    {% block content %}
+    <!-- 各ページの内容 -->
+    {% endblock %}
+  </div>
+</body>
+</html>
+

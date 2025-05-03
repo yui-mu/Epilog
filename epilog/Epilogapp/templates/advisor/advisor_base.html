@@ -1,0 +1,24 @@
+{% extends "base_advisor.html" %}
+
+{% block navigation %}
+<nav style="display: flex; align-items: center; justify-content: space-between;">
+  <div style="display: flex; align-items: center; gap: 12px;">
+    <span style="font-weight: bold; color: #2e5947; font-size: 1.2rem;">EpiLog</span>
+    <a href="{% url 'advisor_unassigned_list' %}">未対応相談一覧</a>
+    <a href="{% url 'advisor_active_chats' %}">チャット対応中</a>
+    <a href="{% url 'advisor_completed_chats' %}">チャット対応済</a>
+    <a href="{% url 'advisor_profile' %}">プロフィール</a>
+  </div>
+  <div>
+    <form method="post" action="{% url 'logout' %}" style="display:inline;">
+      {% csrf_token %}
+      <button type="submit" style="padding: 6px 12px;">ログアウト</button>
+    </form>
+  </div>
+</nav>
+{% endblock %}
+<p style="text-align: right; font-size: 0.9em; color: #444; margin: 0 0 10px;">
+    ログイン中：<strong>{{ user.nickname }}</strong> さん
+</p>
+
+

@@ -1,0 +1,17 @@
+{% extends "advisor/advisor_base.html" %}
+
+{% block content %}
+<h2>チャット対応済</h2>
+
+<ul>
+  {% for session in sessions %}
+    <li>
+      {{ session.user.username }} さん（{{ session.ended_at|date:"Y-m-d H:i" }} 終了）
+    </li>
+  {% empty %}
+    <li>対応済のチャットはありません。</li>
+  {% endfor %}
+</ul>
+
+<a href="{% url 'advisor_active_chats' %}">← チャット対応中へ戻る</a>
+{% endblock %}

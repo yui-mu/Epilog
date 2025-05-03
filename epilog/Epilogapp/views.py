@@ -1,12 +1,14 @@
 from django.shortcuts import render, redirect, get_object_or_404
 from django.contrib.auth.decorators import login_required
 from django.views.decorators.http import require_POST
+from django.views.decorators.http import require_http_methods
 from django.views.generic import TemplateView
 from django.contrib.auth.views import PasswordResetView
 from django.urls import reverse_lazy
 from django.http import JsonResponse, HttpResponseRedirect
 from django.db.models import Q
 from django.utils import timezone
+from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login
@@ -20,10 +22,10 @@ from .forms import (
     UserEditForm,
     EditAccountForm,
     EmailLoginForm,
-    ChatSession
-    
     )
-from .models import SkincareRecord, Product, Favorite, Message, CustomUser, SKIN_CONCERN_CHOICES
+from .models import (
+    SkincareRecord, Product, 
+    Favorite, Message, CustomUser, SKIN_CONCERN_CHOICES,ChatSession, Message)
 import ast
 
 
@@ -75,7 +77,10 @@ class CustomPasswordResetDoneView(TemplateView):
 
 @login_required
 def home_view(request):
-    return render(request, 'home.html')
+    if request.user.is_advisor:
+        return render(request, 'advisor/home.html')
+    else:
+        return render(request, 'home.html')
 
 def top_view(request):
     return render(request, 'top.html')
@@ -460,7 +465,10 @@ def user_record_calendar_events_view(request, user_id):
 @login_required
 def profile_view(request):
     user = request.user
-    return render(request, 'profile.html', {'user': user})
+    if user.is_advisor:
+        return render(request, 'advisor/profile.html', {'user': user})
+    else:
+        return render(request, 'profile.html', {'user': user})
 
 @login_required
 def edit_profile_view(request):
@@ -477,10 +485,13 @@ def edit_profile_view(request):
         profile_form = ProfileForm(instance=user)
         account_form = UserEditForm(instance=user)
 
-    return render(request, 'edit_profile.html', {
+    template_name = 'advisor/edit_profile.html' if user.is_advisor else 'edit_profile.html'
+
+    return render(request, template_name, {
         'profile_form': profile_form,
         'account_form': account_form,
     })
+
 
 User = get_user_model()
 
@@ -496,10 +507,10 @@ def edit_account_view(request):
     else:
         form = EditAccountForm(instance=user)
 
-    return render(request, 'edit_account.html', {'form': form})
+    template_name = 'advisor/edit_account.html' if user.is_advisor else 'edit_account.html'
 
-from django.views.decorators.http import require_POST
-from django.http import JsonResponse
+    return render(request, template_name, {'form': form})
+
 
 @require_POST
 @login_required
@@ -518,3 +529,78 @@ def toggle_favorite_ajax(request):
     else:
         # 新規追加された
         return JsonResponse({'success': True, 'status': 'added'})
+    
+    
+@require_POST
+@login_required
+def advisor_start_chat(request, session_id):
+    session = get_object_or_404(ChatSession, id=session_id)
+    session.advisor = request.user
+    session.status = 'active'
+    session.started_at = timezone.now()
+    session.save()
+    return redirect('advisor_active_chats')  # ※このURLは後で作る「対応中」一覧ページ
+
+@login_required
+def advisor_active_chats(request):
+    sessions = ChatSession.objects.filter(
+        advisor=request.user,
+        status='active'
+    ).order_by('-started_at')
+    return render(request, 'advisor/active_chats.html', {'sessions': sessions})
+
+@login_required
+@require_http_methods(["GET", "POST"])
+def chat_session_detail(request, session_id):
+    session = get_object_or_404(ChatSession, id=session_id)
+
+    # ログインユーザーがアドバイザー本人でなければアクセス拒否
+    if request.user != session.advisor:
+        return redirect('advisor_active_chats')
+
+    # メッセージ送信処理
+    if request.method == 'POST':
+        content = request.POST.get('content')
+        if content:
+            Message.objects.create(
+                session=session,
+                sender=request.user,
+                receiver=session.user,  # 相手ユーザー
+                content=content
+            )
+        return redirect('chat_session_detail', session_id=session.id)
+
+    # すべてのメッセージを取得（このセッションに属する）
+    messages = session.messages.order_by('timestamp')
+
+    return render(request, 'advisor/chat_session_detail.html', {
+        'session': session,
+        'messages': messages,
+    })
+    
+@require_POST
+@login_required
+def chat_session_complete(request, session_id):
+    session = get_object_or_404(ChatSession, id=session_id)
+    if request.user != session.advisor:
+        return redirect('advisor_active_chats')
+
+    session.status = 'completed'
+    session.ended_at = timezone.now()
+    session.save()
+    return redirect('advisor_active_chats')
+
+@login_required
+def advisor_completed_chats(request):
+    sessions = ChatSession.objects.filter(
+        advisor=request.user, status='completed'
+    ).order_by('-ended_at')
+    return render(request, 'advisor/completed_chats.html', {
+        'sessions': sessions
+    })
+
+@login_required
+def advisor_profile_view(request):
+    return render(request, 'advisor/profile.html', {
+        'user': request.user
+    })

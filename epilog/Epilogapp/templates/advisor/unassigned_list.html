@@ -1,0 +1,35 @@
+{% extends "advisor/advisor_base.html" %}
+
+{% block content %}
+<h2>未対応相談一覧</h2>
+
+<table>
+  <thead>
+    <tr>
+      <th>ユーザー名</th>
+      <th>相談内容（最新メッセージ）</th>
+      <th>日付</th>
+      <th>対応開始</th>
+    </tr>
+  </thead>
+  <tbody>
+    {% for session in sessions %}
+    <tr>
+      <td>{{ session.user.username }}</td>
+      <td>
+        {{ session.messages.last.content|default:"(メッセージなし)"|truncatechars:30 }}
+      </td>
+      <td>{{ session.created_at|date:"Y-m-d H:i" }}</td>
+      <td>
+        <form method="post" action="{% url 'advisor_start_chat' session.id %}">
+          {% csrf_token %}
+          <button type="submit">対応開始</button>
+        </form>
+      </td>
+    </tr>
+    {% empty %}
+    <tr><td colspan="4">未対応の相談はありません。</td></tr>
+    {% endfor %}
+  </tbody>
+</table>
+{% endblock %}

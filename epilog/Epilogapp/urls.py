@@ -81,6 +81,14 @@ urlpatterns = [
     path('logged_out/', TemplateView.as_view(template_name='registration/logged_out.html'), name='logged_out'),
     path('login/', email_login_view, name='login'),
     path('favorite/ajax/toggle/', toggle_favorite_ajax, name='toggle_favorite_ajax'),
+    path('advisor/unassigned/', views.advisor_unassigned_list, name='advisor_unassigned_list'),
+    path('advisor/start_chat/<int:session_id>/', views.advisor_start_chat, name='advisor_start_chat'),
+    path('advisor/active/', views.advisor_active_chats, name='advisor_active_chats'),
+    path('advisor/session/<int:session_id>/', views.chat_session_detail, name='chat_session_detail'),
+    path('advisor/session/<int:session_id>/complete/', views.chat_session_complete, name='chat_session_complete'),
+    path('advisor/completed/', views.advisor_completed_chats, name='advisor_completed_chats'),
+    path('advisor/profile/', views.advisor_profile_view, name='advisor_profile'),
+
 
 
 ]

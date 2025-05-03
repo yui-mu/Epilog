@@ -81,27 +81,29 @@
 </head>
 <body>
   {% if user.is_authenticated %}
-    <nav style="display: flex; align-items: center; justify-content: space-between;">
-      <div style="display: flex; align-items: center; gap: 12px;">
-      <span style="font-weight: bold; color: #2e5947; font-size: 1.2rem;">EpiLog</span>
-      <a href="{% url 'home' %}">記録</a>
-      <a href="{% url 'product_search' %}">商品検索</a>
-      <a href="{% url 'favorite_list' %}">お気に入り</a>
-      <a href="{% url 'chat' %}">相談</a>  
-      <a href="{% url 'profile' %}">プロフィール</a>
-      <a href="{% url 'record_list' %}">履歴一覧</a>
-      {% if user.is_advisor %}
-        <a href="{% url 'chat_user_list' %}">ユーザー一覧</a>
-      {% endif %}
-    </div>
+    {% block navigation %}
+      <nav style="display: flex; align-items: center; justify-content: space-between;">
+        <div style="display: flex; align-items: center; gap: 12px;">
+        <span style="font-weight: bold; color: #2e5947; font-size: 1.2rem;">EpiLog</span>
+        <a href="{% url 'home' %}">記録</a>
+        <a href="{% url 'product_search' %}">商品検索</a>
+        <a href="{% url 'favorite_list' %}">お気に入り</a>
+        <a href="{% url 'chat' %}">相談</a>  
+        <a href="{% url 'profile' %}">プロフィール</a>
+        <a href="{% url 'record_list' %}">履歴一覧</a>
+        {% if user.is_advisor %}
+          <a href="{% url 'chat_user_list' %}">ユーザー一覧</a>
+        {% endif %}
+      </div>
 
-    <div>
-      <form method="post" action="{% url 'logout' %}" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit" style="...">ログアウト</button>
-      </form>      
-    </div>  
-    </nav>
+      <div>
+        <form method="post" action="{% url 'logout' %}" style="display:inline;">
+          {% csrf_token %}
+          <button type="submit" style="...">ログアウト</button>
+        </form>      
+      </div>  
+      </nav>
+    {% endblock %}
   {% endif %}
 
   <div class="container">
