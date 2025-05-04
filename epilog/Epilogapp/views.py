@@ -380,6 +380,7 @@ def chat_view(request):
         'messages': messages,
         'user_list': user_list,
         'chat_sessions': chat_sessions,
+        'advisor': advisor, 
     })
     
 @login_required
@@ -681,6 +682,11 @@ def advisor_profile_view(request):
         'user': user,
         'expertise_list': expertise_list,
     })
+    
+@login_required
+def advisor_profile(request, user_id):
+    advisor = get_object_or_404(CustomUser, id=user_id, is_advisor=True)
+    return render(request, 'advisor_profile.html', {'advisor': advisor})
 
 
 @login_required

@@ -95,5 +95,6 @@ urlpatterns = [
     path('advisor/dashboard/session/<int:session_id>/', views.chat_dashboard_view, name='advisor_chat_dashboard_with_session'),
     path('advisor/chat/<int:session_id>/', views.advisor_active_chats, name='advisor_chat_dashboard_with_session'),
     path('advisor/chat/', views.advisor_active_chats, name='advisor_active_chats'),
+    path('advisor/<int:user_id>/profile/', views.advisor_profile, name='advisor_profile'),
 
 ]

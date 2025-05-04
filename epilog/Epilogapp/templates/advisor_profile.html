@@ -1,0 +1,39 @@
+{% extends "base.html" %}
+{% load static %}
+{% load custom_filters %}
+
+{% block content %}
+<h2 style="margin-bottom: 20px;">アドバイザー プロフィール</h2>
+
+<div style="display: flex; align-items: flex-start; gap: 30px;">
+  <!-- プロフィール写真 -->
+  <div>
+    {% if advisor.profile_photo %}
+      <img src="{{ advisor.profile_photo.url }}" alt="プロフィール写真" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
+    {% else %}
+      <img src="{% static 'images/default_profile.png' %}" alt="デフォルト画像" style="width: 150px; height: 150px; border-radius: 50%; object-fit: cover;">
+    {% endif %}
+  </div>
+
+  <!-- プロフィール情報 -->
+  <div style="flex: 1;">
+    <p><strong>名前：</strong>{{ advisor.nickname }}</p>
+    
+
+    <p><strong>専門分野：</strong><br>
+      {% if advisor.expertise %}
+        {% for item in advisor.expertise|split:"," %}
+          ・{{ item|expertise_label }}<br>
+        {% endfor %}
+      {% else %}
+        ー
+      {% endif %}
+    </p>
+
+    <p><strong>資格：</strong><br>{{ advisor.certification|default:"ー" }}</p>
+    <p><strong>対応可能時間：</strong><br>{{ advisor.available_time|default:"ー" }}</p>
+  </div>
+</div>
+
+<a href="{% url 'chat' %}" style="display: inline-block; margin-top: 20px;">← チャットへ戻る</a>
+{% endblock %}

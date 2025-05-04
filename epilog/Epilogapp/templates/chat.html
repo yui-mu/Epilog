@@ -24,6 +24,16 @@
 
   <!-- 右カラム：チャット内容 -->
   <div class="chat-main" style="width: 65%;">
+
+    {% if not request.user.is_advisor and advisor %}
+    <p>
+      アドバイザー：
+      <a href="{% url 'advisor_profile' advisor.id %}">
+        {{ advisor.nickname }}
+      </a>
+    </p>
+    {% endif %}
+    
     <div style="border:1px solid #ccc; padding:10px; height:300px; overflow-y:scroll; margin-bottom:20px;">
       {% for msg in messages %}
         <p><strong>{{ msg.sender.username }}</strong>: {{ msg.content }}<br><small>{{ msg.timestamp }}</small></p>
