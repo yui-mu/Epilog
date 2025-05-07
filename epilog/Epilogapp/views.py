@@ -79,7 +79,6 @@ class CustomPasswordResetDoneView(TemplateView):
 
 @login_required
 def home_view(request):
-    print("=== home_view が呼ばれました ===")
     print("is_advisor =", request.user.is_advisor)
     user = request.user
     if user.is_advisor:
