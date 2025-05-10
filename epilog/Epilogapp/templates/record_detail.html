@@ -18,40 +18,33 @@
     {{ record.get_skin_rating_display }}
   </p>
 
-  <p><strong>肌の状態メモ：</strong>{{ record.skin_condition|default:"（記入なし）" }}</p>
+  <p><strong>肌の状態メモ：</strong>{{ record.skin_condition|default:"（記入なし）"|linebreaksbr }}</p>
 
   <h4 style="margin-top: 1.5em;">🌞 朝に使ったアイテム（使用順）</h4>
   {% if morning_list %}
     <ol>
       {% for item in morning_list %}
-        <li>{{ item.category }}：{{ item.name }}{% if item.ingredient %}（成分：{{ item.ingredient }}）{% endif %}</li>
+        <li>{{ item.category }}：{{ item.name }}</li>
       {% endfor %}
     </ol>
+
   {% else %}
     <p>（記録なし）</p>
   {% endif %}
 
-  <h4>🌙 夜に使ったアイテム（使用順）</h4>
+  <h4 style="margin-top: 1.5em;">🌙 夜に使ったアイテム（使用順）</h4>
   {% if night_list %}
     <ol>
       {% for item in night_list %}
-      <li>{{ item.category }}：{{ item.name }}{% if item.ingredient %}（成分：{{ item.ingredient }}）{% endif %}</li>
+        <li>{{ item.category }}：{{ item.name }}</li>
       {% endfor %}
     </ol>
   {% else %}
     <p>（記録なし）</p>
   {% endif %}
 
-  <h4>肌悩み：</h4>
-  <p>
-    {% if concerns_list %}
-      {{ concerns_list|join:"、" }}
-    {% else %}
-      （記録なし）
-    {% endif %}
-  </p>
 
-  <p><strong>成分：</strong><br>{{ record.ingredients|linebreaksbr|default:"（記録なし）" }}</p>
+
 
   {% if record.photo %}
     <p><strong>写真：</strong><br>

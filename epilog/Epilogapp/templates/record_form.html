@@ -328,8 +328,7 @@
                 <option value="パック">パック</option>
                 <option value="その他">その他</option>
               </select>
-              <input type="text" class="morning-input-name" placeholder="商品名">
-              <input type="text" class="morning-input-ingredient" placeholder="成分名（任意）">
+              <input type="text" class="morning-input-name" placeholder="商品名 / 成分（任意）">
             </div>
           {% endfor %}
         </div>        
@@ -359,8 +358,7 @@
                 <option value="パック">パック</option>
                 <option value="その他">その他</option>
               </select>
-              <input type="text" class="night-input-name" placeholder="商品名">
-              <input type="text" class="night-input-ingredient" placeholder="成分名（任意）">
+              <input type="text" class="night-input-name" placeholder="商品名 / 成分（任意）">
             </div>
           {% endfor %}
         </div>
@@ -371,6 +369,7 @@
 
     <input type="hidden" name="morning_items" id="id_morning_items" value="{{ form.initial.morning_items|default:''|escape }}">
     <input type="hidden" name="night_items" id="id_night_items" value="{{ form.initial.night_items|default:''|escape }}">
+    <input type="hidden" name="ingredients" id="id_ingredients" value="{{ form.initial.ingredients|default:''|escape }}">
 
 
     <!-- 登録ボタン -->
@@ -440,8 +439,8 @@
     const nightCsv = extractItemsFromCsv(nightRaw, 6).join(',');
     
     // ✅ 初期化呼び出し（6件まで）
-    populateSimpleInputs("{{ form.morning_items.value|escapejs }}", "morning-inputs", "morning-input-name", 6);
-    populateSimpleInputs("{{ form.night_items.value|escapejs }}", "night-inputs", "night-input-name", 6);
+    //populateSimpleInputs("{{ form.morning_items.value|escapejs }}", "morning-inputs", "morning-input-name", 6);
+    //populateSimpleInputs("{{ form.night_items.value|escapejs }}", "night-inputs", "night-input-name", 6);
 
     
   
@@ -466,6 +465,10 @@
         } else {
           name = parts[0];  // ← 商品名だけの場合にも対応！
         }
+
+        if (name === "None") {
+          name = "";
+        }
         
         if (index >= maxInitial) return;  // ✅ 7件目以降は非表示
 
@@ -476,7 +479,7 @@
             <button type="button" class="remove-btn">－</button>
             <label class="item-label">${index + 1}番目：</label>
           </div>
-          <select class="${inputClass}-select">
+          <select class="${inputClass}-select-type">
             <option value="">種類を選択</option>
             <option value="クレンジング" ${category === "クレンジング" ? "selected" : ""}>クレンジング</option>
             <option value="洗顔" ${category === "洗顔" ? "selected" : ""}>洗顔</option>
@@ -488,8 +491,7 @@
             <option value="パック" ${category === "パック" ? "selected" : ""}>パック</option>
             <option value="その他" ${category === "その他" ? "selected" : ""}>その他</option>
           </select>
-          <input type="text" class="${inputClass}" value="${name}" placeholder="商品名">
-          <input type="text" class="${inputClass}-ingredient" value="${ingredient}" placeholder="成分名（任意）">
+          <input type="text" class="${inputClass}" value="${name}" placeholder="商品名 / 成分（任意）">
         `;
         container.appendChild(div);
       });
@@ -529,8 +531,7 @@
             <option value="パック">パック</option>
             <option value="その他">その他</option>
           </select>
-          <input type="text" class="morning-input-name" placeholder="商品名">
-          <input type="text" class="morning-input-ingredient" placeholder="成分名（任意）">
+          <input type="text" class="morning-input-name" placeholder="商品名 / 成分（任意）">
         `;
         morningInputs.appendChild(div);
         updateListeners();
@@ -566,8 +567,7 @@
             <option value="パック">パック</option>
             <option value="その他">その他</option>
           </select>
-          <input type="text" class="night-input-name" placeholder="商品名">
-          <input type="text" class="night-input-ingredient" placeholder="成分名（任意）">
+          <input type="text" class="night-input-name" placeholder="商品名 / 成分（任意）">
         `;
         nightInputs.appendChild(div);
         updateListeners();
@@ -642,6 +642,15 @@
         // デバッグ出力（必須）
       console.log("💾 morning_items 保存前:", document.getElementById('id_morning_items').value);
       console.log("💾 night_items 保存前:", document.getElementById('id_night_items').value);
+
+      // ✅ 成分（朝夜）の入力値をまとめて hidden に入れる
+      const allIngredients = document.querySelectorAll('.morning-input-ingredient, .night-input-ingredient');
+      const ingredientList = Array.from(allIngredients)
+        .map(i => i.value.trim())
+        .filter(Boolean)
+        .join(', ');
+      document.getElementById('id_ingredients').value = ingredientList;
+
 
     });
 

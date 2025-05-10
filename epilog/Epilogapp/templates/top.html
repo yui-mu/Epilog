@@ -41,7 +41,7 @@
 <div class="top-container">
   <h1>ようこそ EpiLog へ！</h1>
   <p>こんにちは、{{ user.username }} さん！</p>
-  <a href="{% url 'home' %}">ホームへ</a>
+  <a href="{% url 'home' %}">ログイン</a>
   <form action="{% url 'logout' %}" method="post" style="display: inline;">
     {% csrf_token %}
     <button type="submit" style="background: none; border: none; color: white; background-color: #a7d7c5; border-radius: 8px; padding: 10px 16px; cursor: pointer;">

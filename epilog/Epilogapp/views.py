@@ -328,18 +328,19 @@ def remove_favorite_view(request, product_id):
 def chat_view(request):
     user = request.user
     advisor = None
+    session = None
 
     if not user.is_advisor:
         advisor = CustomUser.objects.filter(is_advisor=True).first()
-
-    if user.is_advisor:
-        messages = Message.objects.filter(sender=user) | Message.objects.filter(receiver=user)
+        session = ChatSession.objects.filter(user=user).first()
+        
+        if session:
+            messages = Message.objects.filter(session=session).order_by('timestamp')
+        else:
+            messages = []
+        
     else:
-        messages = Message.objects.filter(sender=user) | Message.objects.filter(receiver=user)
-        if advisor:
-            messages |= Message.objects.filter(receiver=advisor)
-
-    messages = messages.order_by('timestamp')
+        messages = []
 
     if request.method == 'POST':
         content = request.POST.get('content')
@@ -350,11 +351,11 @@ def chat_view(request):
                     receiver = CustomUser.objects.get(id=receiver_id)
                     Message.objects.create(sender=user, receiver=receiver, content=content)
                 except CustomUser.DoesNotExist:
-                    pass  # 無効なユーザーIDだった場合
+                    pass  
             else:
-            # ユーザーが送信する場合、ChatSessionを取得 or 作成して紐づける！
+            
                 if advisor:
-                    session, created = ChatSession.objects.get_or_create(
+                    session, _ = ChatSession.objects.get_or_create(
                         user=user,
                         status='unassigned',
                         defaults={'advisor': advisor}
