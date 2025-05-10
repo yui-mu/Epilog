@@ -269,9 +269,10 @@ def product_create_view(request):
 @login_required
 def product_search_view(request):
     form = ProductSearchForm(request.GET or None)
-    products = Product.objects.all()
+    products = None
 
     if form.is_valid() and request.GET:
+        products = Product.objects.all()
         keyword = form.cleaned_data.get('keyword')
         category = form.cleaned_data.get('category')
         concern = form.cleaned_data.get('concern')

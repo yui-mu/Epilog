@@ -1,7 +1,7 @@
 
 {% extends 'base.html' %}
-
 {% block content %}
+
 <style>
   .search-wrapper {
     display: flex;
@@ -9,14 +9,11 @@
     align-items: center;
     padding: 40px 20px;
   }
-
   .search-title {
     font-size: 24px;
     font-weight: bold;
     margin-bottom: 20px;
-    text-align: center;
   }
-
   .search-form-box {
     width: 75%;
     max-width: 600px;
@@ -25,42 +22,41 @@
     border-radius: 10px;
     box-shadow: 2px 2px 8px rgba(0, 0, 0, 0.05);
     margin-bottom: 40px;
-    text-align: center;
-    
   }
-
-  .search-form-box label {
+  label {
     display: block;
-    margin-top: 10px;
+    margin-top: 15px;
     font-weight: bold;
-    font-size: 14px;
-    text-align: center;
   }
-
-  .search-form-box input,
-  .search-form-box select {
-    width: 60%;
+  input, select {
+    width: 100%;
     padding: 8px;
     margin-top: 5px;
     font-size: 14px;
     border: 1px solid #ccc;
     border-radius: 6px;
   }
-
-  .search-form-box button {
-    margin-top: 20px;  /* 
-    padding: 10px 20px;
+  .btn-toggle {
+    margin-top: 10px;
+    background: none;
+    border: none;
+    color: #00796b;
+    cursor: pointer;
+    text-decoration: underline;
+  }
+  button[type="submit"] {
+    margin-top: 20px;
+    padding: 10px;
+    width: 100%;
     font-size: 16px;
     background-color: #b2dfdb;
     color: white;
     border: none;
     border-radius: 8px;
     cursor: pointer;
-    display: block;
-    margin-left: auto;
-    margin-right: auto;
   }
-  
+
+  /* 商品カード部分 */
   .results-title {
     text-align: center;
     font-size: 18px;
@@ -73,23 +69,21 @@
     padding: 0;
     margin: 0 auto;
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); /* ★ 3列対応 */
-    gap: 20px; /* ★ 各カードの間に余白を設定 */
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 20px;
     max-width: 1000px;
   }
-  
 
   .product-card {
-    width: 250px;
+    width: 100%;
     padding: 15px;
-    margin: 20px 0;
     border: 1px solid #ccc;
     border-radius: 10px;
     text-align: center;
     background-color: #fff;
     box-shadow: 2px 2px 5px rgba(0, 0, 0, 0.1);
-    display: flex; /* 内部要素の位置を調整しやすくする */
-    flex-direction: column; /* 内部要素を縦並びにする */
+    display: flex;
+    flex-direction: column;
     align-items: center;
     position: relative;
   }
@@ -105,24 +99,16 @@
     font-size: 16px;
     margin: 10px 0 5px 0;
   }
-  
+
   .product-card p {
     font-size: 14px;
     margin: 0 0 10px 0;
   }
-  
 
   .image-wrapper {
     position: relative;
     width: 100%;
-    overflow: hidden; /* ★ はみ出る部分を隠す */
-  }
-  
-  .image-wrapper img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    border-radius: 8px;
+    overflow: hidden;
   }
 
   .favorite-btn {
@@ -131,9 +117,9 @@
     background: none;
     color: gray;
     cursor: pointer;
-    position: absolute; /* ★絶対位置を指定（これを追加） */
-    bottom: 8px;       /* ★画像内の下位置（調整可能） */
-    right: 8px;        /* ★画像内の右位置（調整可能） */
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
   }
 
   .favorite-btn.added {
@@ -143,31 +129,30 @@
 
 <div class="search-wrapper">
   <h1 class="search-title">商品検索</h1>
-
   <div class="search-form-box">
     <form method="get">
-      <label>キーワード（商品名・ブランド名・成分名）：</label>
+      <label>キーワード：</label>
       {{ form.keyword }}
 
       <label>カテゴリ：</label>
       {{ form.category }}
 
-      <label>悩み・効果：</label>
-      {{ form.concern }}
+      <button type="button" class="btn-toggle" onclick="toggleDetails()">＋ 詳細検索</button>
 
-      <label>肌質：</label>
-      {{ form.skin_type }}
+      <div id="detail-box" style="display: none;">
+        <label>悩み・効果：</label>
+        {{ form.concern }}
 
-      <label>成分の特徴（例：保湿、低刺激など）：</label>
-      <input type="text" name="feature" ...>
+        <label>肌質：</label>
+        {{ form.skin_type }}
 
-      <div style="margin-top: 20px;">
-        <button type="submit">検索する</button>
+        <label>成分の特徴：</label>
+        {{ form.feature }}
       </div>
+
+      <button type="submit">検索する</button>
     </form>
   </div>
-
-  <input type="hidden" id="csrf-token" value="{{ csrf_token }}">
 
   <h2 class="results-title">検索結果</h2>
 
@@ -177,8 +162,7 @@
         <li class="product-card">
           <div class="image-wrapper">
             <img src="{{ product.image.url }}" alt="{{ product.name }}">
-            <button class="favorite-btn {% if product.id in favorite_ids %}added{% endif %}"
-                    data-product-id="{{ product.id }}">
+            <button class="favorite-btn {% if product.id in favorite_ids %}added{% endif %}" data-product-id="{{ product.id }}">
               {% if product.id in favorite_ids %}❤{% else %}♥{% endif %}
             </button>
           </div>
@@ -193,38 +177,36 @@
 </div>
 
 <script>
+  function toggleDetails() {
+    const box = document.getElementById("detail-box");
+    box.style.display = box.style.display === "none" ? "block" : "none";
+  }
+
+  // お気に入りボタン処理
   document.addEventListener('DOMContentLoaded', function () {
-      const buttons = document.querySelectorAll('.favorite-btn');
-  
-      buttons.forEach(button => {
-          button.addEventListener('click', function () {
-              const productId = this.dataset.productId;
-              const btn = this;
-  
-              fetch("{% url 'toggle_favorite_ajax' %}", {
-                  method: 'POST',
-                  headers: {
-                      'X-CSRFToken': '{{ csrf_token }}',
-                      'Content-Type': 'application/x-www-form-urlencoded',
-                  },
-                  body: 'product_id=' + productId
-              })
-              .then(response => response.json())
-              .then(data => {
-                  if (data.success) {
-                      btn.classList.toggle('added');
-                      btn.textContent = btn.classList.contains('added') ? '❤' : '♥';
-                  }
-              })
-              .catch(error => console.error('エラーが発生しました:', error));
-          });
+    const buttons = document.querySelectorAll('.favorite-btn');
+    buttons.forEach(button => {
+      button.addEventListener('click', function () {
+        const productId = this.dataset.productId;
+        const btn = this;
+        fetch("{% url 'toggle_favorite_ajax' %}", {
+          method: 'POST',
+          headers: {
+            'X-CSRFToken': '{{ csrf_token }}',
+            'Content-Type': 'application/x-www-form-urlencoded',
+          },
+          body: 'product_id=' + productId
+        })
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            btn.classList.toggle('added');
+            btn.textContent = btn.classList.contains('added') ? '❤' : '♥';
+          }
+        });
       });
+    });
   });
 </script>
-  
-  
+
 {% endblock %}
-
-
-
-
