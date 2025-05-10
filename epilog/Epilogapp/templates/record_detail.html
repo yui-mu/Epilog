@@ -24,10 +24,11 @@
   {% if morning_list %}
     <ol>
       {% for item in morning_list %}
-        <li>{{ item.category }}：{{ item.name }}</li>
+        <li>
+          {{ item.category }}：{{ item.name }}{% if item.ingredient %}（{{ item.ingredient }}）{% endif %}
+        </li>
       {% endfor %}
     </ol>
-
   {% else %}
     <p>（記録なし）</p>
   {% endif %}
@@ -36,15 +37,14 @@
   {% if night_list %}
     <ol>
       {% for item in night_list %}
-        <li>{{ item.category }}：{{ item.name }}</li>
+        <li>
+          {{ item.category }}：{{ item.name }}{% if item.ingredient %}（{{ item.ingredient }}）{% endif %}
+        </li>
       {% endfor %}
     </ol>
   {% else %}
     <p>（記録なし）</p>
   {% endif %}
-
-
-
 
   {% if record.photo %}
     <p><strong>写真：</strong><br>
@@ -58,3 +58,5 @@
   </div>
 </div>
 {% endblock %}
+
+

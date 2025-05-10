@@ -1,296 +1,40 @@
 {% extends 'base.html' %}
 {% block content %}
 
-<style>
-  .record-container {
-    max-width: 1000px;
-    margin: 40px auto;
-    padding: 30px 20px;
-    background-color: #ffffff;
-    border-radius: 12px;
-  }
-
-  .page-title {
-    text-align: center;
-    font-size: 24px;
-    margin-bottom: 30px;
-  }
-
-  .form-group,
-  .photo-section,
-  .concern-block,
-  .form-actions {
-    margin-bottom: 30px;
-  }
-
-  .care-sections {
-    display: flex;
-    gap: 40px;
-    justify-content: space-between;
-    margin-top: 30px;
-  }
-
-  .care-block {
-    flex: 1;
-    background-color: #f5f9f6;
-    padding: 20px;
-    border: 1px solid #a7d7c5;
-    border-radius: 12px;
-  }
-
-  .care-block h3 {
-    text-align: center;
-    margin-bottom: 20px;
-    font-size: 18px;
-  }
-
-  .item-row {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 4px;
-    margin-bottom: 12px;
-  }
-  
-  .row-header {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-  }
-
-  .item-label {
-    font-weight: bold;
-    white-space: nowrap;
-    margin: 0;
-    padding: 0;
-    line-height: 1;
-    display: flex;
-    align-items: center; 
-    margin-top: 15px;
-  }
-  
-  
-  .item-row input {
-    width: 100%;
-    padding: 6px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-bottom: 4px;
-  }
-
-  .item-row select {
-    width: 100%;
-    padding: 6px;
-    font-size: 14px;
-    border: 1px solid #ccc;
-    border-radius: 6px;
-    margin-bottom: 4px;
-  }
-  
-
-  label {
-    font-weight: bold;
-    display: block;
-    margin-bottom: 5px;
-  }
-
-  .condition-icons {
-    display: flex;
-    justify-content: center;
-    gap: 30px;
-    margin-top: 10px;
-  }
-
-  .face-label span {
-    display: block;
-    text-align: center;
-    font-size: 14px;
-  }
-
-  .form-actions {
-    text-align: center;
-  }
-
-  button {
-    background-color: #a7d7c5;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    padding: 10px 20px;
-    font-size: 16px;
-    cursor: pointer;
-    margin-top: 20px;
-  }
-
-  .remove-btn {
-    background-color: #eee;
-    color: #333;
-    border: 1px solid #ccc;
-    border-radius: 4px;
-    font-size: 14px;
-    width: 26px;
-    height: 26px;
-    padding: 0;
-    line-height: 1;
-    margin-right: 8px;
-    cursor: pointer;
-    vertical-align: middle;
-  }
-  
-
-  a {
-    text-align: center;
-    display: block;
-    margin-top: 20px;
-  }
-
-  .condition-icons {
-    display: flex;
-    justify-content: center;
-    gap: 25px;
-    margin-top: 10px;
-  }
-
-  .skin-rating-option {
-    width: 70px;
-    text-align: center;
-    padding: 8px;
-    cursor: pointer;
-    display: inline-block;
-  }
-
-
-  .skin-rating-option .icon {
-    font-size: 32px;
-    line-height: 1;
-    display: block;
-    text-align: center;
-  }
-
-  .skin-rating-option.selected {
-    border: 2px solid #3ba58b;
-    background-color: #e0f4ef;
-    border-radius: 8px;
-  }
-
-  .skin-rating-option input[type="radio"] {
-    position: absolute;
-    opacity: 0;
-    pointer-events: none;
-  }
-  
-
-  .skin-rating-option .label-text {
-    margin-top: 5px;
-    font-size: 14px;
-  }
-
-  .skin-rating-widget {
-    display: flex;
-    justify-content: center;
-    gap: 20px;
-    flex-wrap: wrap;
-    margin-top: 10px;
-  }
-
-  .photo-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    gap: 40px;
-    margin-bottom: 30px;
-  }
-  
-  .photo-section .left-block,
-  .photo-section .right-block {
-    flex: 1;
-  }
-  
-  #preview-button {
-    margin-top: 10px;
-  }
-
-  #id_skin_condition {
-    display: block;
-    margin: 0 auto;          
-    width: 90%;              
-    max-width: 800px;
-    height: 80px;
-    padding: 10px;
-    border-radius: 8px;
-    border: 1px solid #ccc;
-    font-size: 14px;
-    resize: vertical;
-  }
-  
-  #add-morning-item,
-  #add-night-item {
-    background-color: #a7d7c5;
-    color: white;
-    border: none;
-    padding: 8px 12px;
-    border-radius: 6px;
-    font-size: 14px;
-    cursor: pointer;
-  }
-
-
-</style>
-
-
 <div class="record-container">
-  <h1 class="page-title" style="text-align:center;">スキンケア記録フォーム</h1>
+  <h1 class="page-title">スキンケア記録フォーム</h1>
   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
 
-    {% if form.errors %}
-      <div style="background-color: #fce4e4; border: 1px solid #f5c2c2; color: #c72c2c;
-              padding: 10px; margin: 15px auto; max-width: 600px; border-radius: 6px;">
-        <ul>
-          {% for field in form %}
-            {% for error in field.errors %}
-              <li>{{ field.label }}: {{ error }}</li>
-            {% endfor %}
-          {% endfor %}
-        </ul>
-      </div>
-    {% endif %}
-
-    <!-- 肌の写真アップロード -->
-    <div class="photo-section">
-      <div class="left-block">
-        <label>{{ form.record_date.label }}</label><br>
-        {{ form.record_date }}
-      </div>
-      <div class="right-block">
-        <label>{{ form.photo.label }}</label><br>
-        {{ form.photo }}<br>
-        <button type="button" id="preview-button">現在の肌の写真を登録</button>
-        <div id="photo-preview" style="margin-top: 10px;">
-          <img id="preview-image" src="#" alt="プレビュー画像"
-               style="max-width: 250px; display: none; border-radius: 8px;">
-        </div>
-      </div>
+    <!-- 記録日 -->
+    <div>
+      <label>{{ form.record_date.label }}</label><br>
+      {{ form.record_date }}
     </div>
-    
-    <!-- ✅ 肌の調子：顔アイコン選択処理 -->
-    <div class="form-group">
+
+    <!-- 肌の写真 -->
+    <div>
+      <label>{{ form.photo.label }}</label><br>
+      {{ form.photo }}<br>
+      <button type="button" id="preview-button">現在の肌の写真を登録</button><br>
+      <img id="preview-image" src="#" style="max-width:200px; display:none; margin-top:10px;">
+    </div>
+
+    <!-- 肌の調子 -->
+    <div>
       <strong>{{ form.skin_rating.label }}</strong>
       <div class="skin-rating-widget">
         {% for radio in form.skin_rating %}
           {% if radio.choice_label != '---------' %}
-            {{ radio.tag }}
-            <label for="{{ radio.id_for_label }}">
-              <span class="icon">
-                {% if radio.choice_label == "とても良い" %} 😄
-                {% elif radio.choice_label == "良い" %} 🙂
-                {% elif radio.choice_label == "普通" %} 😐
-                {% elif radio.choice_label == "やや悪い" %} 😕
-                {% elif radio.choice_label == "悪い" %} 😣
-                {% endif %}
-              </span>
-              <span class="label-text">{{ radio.choice_label }}</span>
+            <label for="{{ radio.id_for_label }}" style="margin-right:10px;">
+              {{ radio.tag }}
+              {% if radio.choice_label == "とても良い" %} 😄
+              {% elif radio.choice_label == "良い" %} 🙂 
+              {% elif radio.choice_label == "普通" %} 😐 
+              {% elif radio.choice_label == "やや悪い" %} 😕 
+              {% elif radio.choice_label == "悪い" %} 😣 
+              {% endif %}
+              {{ radio.choice_label }}
             </label>
           {% endif %}
         {% endfor %}
@@ -298,373 +42,147 @@
     </div>
 
     <!-- 肌の状態メモ -->
-    <p>
-      {{ form.skin_condition.label_tag }}<br>
-      {{ form.skin_condition }}
-    </p>
+    <p>{{ form.skin_condition.label_tag }}<br>{{ form.skin_condition }}</p>
 
-    <!-- 朝・夜のスキンケア -->
-    <div class="care-sections">
-
-      <!-- 朝 -->
-      <div class="care-block" id="morning-block">
-        <strong>🌞 朝に使ったアイテム</strong>
-        <div id="morning-inputs">
-          {% for i in "123456" %}
-            <div class="item-row">
-              <div class="row-header">
-                <button type="button" class="remove-btn">－</button>
-                <label class="item-label">{{ forloop.counter }}番目：</label>
-              </div>
-              <select class="morning-select-type">
-                <option value="">種類を選択</option>
-                <option value="クレンジング">クレンジング</option>
-                <option value="洗顔">洗顔</option>
-                <option value="導入美容液">導入美容液</option>
-                <option value="化粧水">化粧水</option>
-                <option value="乳液">乳液</option>
-                <option value="美容液">美容液</option>
-                <option value="クリーム">クリーム</option>
-                <option value="パック">パック</option>
-                <option value="その他">その他</option>
-              </select>
-              <input type="text" class="morning-input-name" placeholder="商品名 / 成分（任意）">
-            </div>
-          {% endfor %}
-        </div>        
-        <button type="button" id="add-morning-item">＋項目を追加する</button>
-        
-      </div>
-    
-      <!-- 夜 -->
-      <div class="care-block" id="night-block">
-        <strong>🌙 夜に使ったアイテム</strong>
-        <div id="night-inputs">
-          {% for i in "123456" %}
-            <div class="item-row">
-              <div class="row-header">
-                <button type="button" class="remove-btn">－</button>
-                <label class="item-label">{{ forloop.counter }}番目：</label>
-              </div>
-              <select class="night-select-type">
-                <option value="">種類を選択</option>
-                <option value="クレンジング">クレンジング</option>
-                <option value="洗顔">洗顔</option>
-                <option value="導入美容液">導入美容液</option>
-                <option value="化粧水">化粧水</option>
-                <option value="乳液">乳液</option>
-                <option value="美容液">美容液</option>
-                <option value="クリーム">クリーム</option>
-                <option value="パック">パック</option>
-                <option value="その他">その他</option>
-              </select>
-              <input type="text" class="night-input-name" placeholder="商品名 / 成分（任意）">
-            </div>
-          {% endfor %}
-        </div>
-        <button type="button" id="add-night-item">＋項目を追加する</button>
-        
-      </div>
+    <!-- 朝 -->
+    <div>
+      <h3>🌞 朝に使ったアイテム</h3>
+      <div id="morning-inputs"></div>
+      <button type="button" id="add-morning-item">＋項目を追加する</button>
     </div>
 
+    <!-- 夜 -->
+    <div>
+      <h3>🌙 夜に使ったアイテム</h3>
+      <div id="night-inputs"></div>
+      <button type="button" id="add-night-item">＋項目を追加する</button>
+    </div>
+
+    <!-- hidden -->
     <input type="hidden" name="morning_items" id="id_morning_items" value="{{ form.initial.morning_items|default:''|escape }}">
     <input type="hidden" name="night_items" id="id_night_items" value="{{ form.initial.night_items|default:''|escape }}">
     <input type="hidden" name="ingredients" id="id_ingredients" value="{{ form.initial.ingredients|default:''|escape }}">
 
-
-    <!-- 登録ボタン -->
     <div class="form-actions">
-      <button type="submit">記録する</button>
+      <button type="submit" style="margin-top: 20px;">記録する</button>
     </div>
   </form>
 </div>
 
-<!-- 入力内容をまとめて保存するJS -->
 <script>
-  document.addEventListener("DOMContentLoaded", function () {
-  
-    // ✅ 肌の調子：顔アイコン選択処理
-    const options = document.querySelectorAll('.skin-rating-option');
-    options.forEach(option => {
-      option.addEventListener('click', function () {
-        const radio = this.querySelector('input[type="radio"]');
-        if (radio && !radio.checked) {
-          options.forEach(opt => opt.classList.remove('selected'));
-          this.classList.add('selected');
-          radio.checked = true;
-          const event = new Event('change', { bubbles: true });
-          radio.dispatchEvent(event);
-        }
-      });
-    });
-  
-    const selectedRating = document.querySelector('.skin-rating-option input[type="radio"]:checked');
-    if (selectedRating) {
-      selectedRating.closest('.skin-rating-option').classList.add('selected');
+document.addEventListener("DOMContentLoaded", function () {
+
+  function addItem(sectionId, prefix, category='', name='', ingredient='') {
+    const container = document.getElementById(sectionId);
+    const count = container.querySelectorAll('.item-row').length;
+    if (count >= 10) {
+      alert("最大10件まで追加できます。");
+      return;
     }
-  
-    // ✅ 肌の写真プレビュー機能
-    const previewButton = document.getElementById("preview-button");
-    const photoInput = document.getElementById("id_photo");
-    const previewImage = document.getElementById("preview-image");
-    if (previewButton) {
-      previewButton.addEventListener("click", function () {
-        const file = photoInput.files[0];
-        if (file) {
-          const reader = new FileReader();
-          reader.onload = function (e) {
-            previewImage.src = e.target.result;
-            previewImage.style.display = "block";
-          };
-          reader.readAsDataURL(file);
-        } else {
-          alert("画像ファイルを選択してください。");
-        }
-      });
-    }
-
-    function extractItemsFromCsv(csvStr, maxItems) {
-      const items = csvStr.split(',')
-        .map(s => s.trim())
-        .filter(Boolean)
-        .filter(s => s.split(':').length >= 2); 
-      return items.slice(0, maxItems);
-    }
-    
-    const morningRaw = "{{ form.morning_items.value|escapejs }}";
-    console.log("morningRaw:", morningRaw);
-    const nightRaw = "{{ form.night_items.value|escapejs }}";
-    
-    const morningCsv = extractItemsFromCsv(morningRaw, 6).join(',');
-    const nightCsv = extractItemsFromCsv(nightRaw, 6).join(',');
-    
-    // ✅ 初期化呼び出し（6件まで）
-    //populateSimpleInputs("{{ form.morning_items.value|escapejs }}", "morning-inputs", "morning-input-name", 6);
-    //populateSimpleInputs("{{ form.night_items.value|escapejs }}", "night-inputs", "night-input-name", 6);
-
-    
-  
-    // ✅ 編集時の初期商品名の表示（朝・夜）1～6件目まで表示
-    function populateSimpleInputs(csvStr, sectionId, inputClass, maxInitial = 6) {
-      const items = csvStr.split(',').map(s => s.trim()).filter(Boolean);
-      const container = document.getElementById(sectionId);
-      container.innerHTML = "";
-
-      items.forEach((item, index) => {
-        if (!item) return;
-
-        const parts = item.split(':');
-        let category = '';
-        let name = '';
-        let ingredient = '';
-
-        if (parts.length === 3) {
-          [category, name, ingredient] = parts;
-        } else if (parts.length === 2) {
-          [category, name] = parts;
-        } else {
-          name = parts[0];  // ← 商品名だけの場合にも対応！
-        }
-
-        if (name === "None") {
-          name = "";
-        }
-        
-        if (index >= maxInitial) return;  // ✅ 7件目以降は非表示
-
-        const div = document.createElement("div");
-        div.className = "item-row";
-        div.innerHTML = `
-          <div class="row-header">
-            <button type="button" class="remove-btn">－</button>
-            <label class="item-label">${index + 1}番目：</label>
-          </div>
-          <select class="${inputClass}-select-type">
-            <option value="">種類を選択</option>
-            <option value="クレンジング" ${category === "クレンジング" ? "selected" : ""}>クレンジング</option>
-            <option value="洗顔" ${category === "洗顔" ? "selected" : ""}>洗顔</option>
-            <option value="導入美容液" ${category === "導入美容液" ? "selected" : ""}>導入美容液</option>
-            <option value="化粧水" ${category === "化粧水" ? "selected" : ""}>化粧水</option>
-            <option value="乳液" ${category === "乳液" ? "selected" : ""}>乳液</option>
-            <option value="美容液" ${category === "美容液" ? "selected" : ""}>美容液</option>
-            <option value="クリーム" ${category === "クリーム" ? "selected" : ""}>クリーム</option>
-            <option value="パック" ${category === "パック" ? "selected" : ""}>パック</option>
-            <option value="その他" ${category === "その他" ? "selected" : ""}>その他</option>
-          </select>
-          <input type="text" class="${inputClass}" value="${name}" placeholder="商品名 / 成分（任意）">
-        `;
-        container.appendChild(div);
-      });
-
-      updateListeners();
-      renumberItems(`#${sectionId}`);
-    }
-
-    // ✅ 呼び出し（初期表示6件まで）
-    populateSimpleInputs("{{ form.morning_items.value|escapejs }}", "morning-inputs", "morning-input-name", 6);
-    populateSimpleInputs("{{ form.night_items.value|escapejs }}", "night-inputs", "night-input-name", 6);
-
-    // ✅ 朝の追加処理（6件目以降）
-    const morningInputs = document.getElementById("morning-inputs");
-    const addMorningBtn = document.getElementById("add-morning-item");
-    if (addMorningBtn) {
-      addMorningBtn.addEventListener("click", function () {
-        const currentRows = morningInputs.querySelectorAll('.item-row').length;
-        if (currentRows >= 10) {
-          alert("朝は最大10件まで追加できます。");
-          return;
-        }
-        const div = document.createElement("div");
-        div.className = "item-row";
-        div.innerHTML = `
-          <button type="button" class="remove-btn">－</button>
-          <label>番目：</label>
-          <select class="morning-select-type">
-            <option value="">種類を選択</option>
-            <option value="クレンジング">クレンジング</option>
-            <option value="洗顔">洗顔</option>
-            <option value="導入美容液">導入美容液</option>
-            <option value="化粧水">化粧水</option>
-            <option value="乳液">乳液</option>
-            <option value="美容液">美容液</option>
-            <option value="クリーム">クリーム</option>
-            <option value="パック">パック</option>
-            <option value="その他">その他</option>
-          </select>
-          <input type="text" class="morning-input-name" placeholder="商品名 / 成分（任意）">
-        `;
-        morningInputs.appendChild(div);
-        updateListeners();
-        renumberItems('#morning-inputs');
-        bindInputEvents();
-      });
-    }
-
-    // ✅ 夜の追加処理（6件目以降）
-    const nightInputs = document.getElementById("night-inputs");
-    const addNightBtn = document.getElementById("add-night-item");
-    if (addNightBtn) {
-      addNightBtn.addEventListener("click", function () {
-        const currentRows = nightInputs.querySelectorAll('.item-row').length;
-        if (currentRows >= 10) {
-          alert("夜は最大10件まで追加できます。");
-          return;
-        }
-        const div = document.createElement("div");
-        div.className = "item-row";
-        div.innerHTML = `
-          <button type="button" class="remove-btn">－</button>
-          <label>番目：</label>
-          <select class="night-select-type">
-            <option value="">種類を選択</option>
-            <option value="クレンジング">クレンジング</option>
-            <option value="洗顔">洗顔</option>
-            <option value="導入美容液">導入美容液</option>
-            <option value="化粧水">化粧水</option>
-            <option value="乳液">乳液</option>
-            <option value="美容液">美容液</option>
-            <option value="クリーム">クリーム</option>
-            <option value="パック">パック</option>
-            <option value="その他">その他</option>
-          </select>
-          <input type="text" class="night-input-name" placeholder="商品名 / 成分（任意）">
-        `;
-        nightInputs.appendChild(div);
-        updateListeners();
-        renumberItems('#night-inputs');
-        bindInputEvents();
-      });
-    }
-
-    // ✅ 削除・番号更新処理
-    function updateListeners() {
-      document.querySelectorAll('.remove-btn').forEach(btn => {
-        btn.onclick = () => {
-          const row = btn.closest('.item-row');
-          if (row) row.remove();
-          renumberItems('#morning-inputs');
-          renumberItems('#night-inputs');
-        };
-      });
-    }
-
-    function renumberItems(parentSelector) {
-      const container = document.querySelector(parentSelector);
-      if (!container) return;
-      const rows = container.querySelectorAll('.item-row');
-      rows.forEach((row, index) => {
-        const label = row.querySelector('label');
-        if (label) label.textContent = `${index + 1}番目：`;
-      });
-    }
-
-  
-    // ✅ hiddenに反映（保存用）
-    function updateSimpleInputs(parentSelector, prefix, targetId) {
-      const rows = document.querySelectorAll(`${parentSelector} .item-row`);
-      const items = Array.from(rows).map(row => {
-        const category = row.querySelector(`.${prefix}-select-type`)?.value.trim() || '';
-        const name = row.querySelector(`.${prefix}-input-name`)?.value.trim() || '';
-        const ingredient = row.querySelector(`.${prefix}-input-ingredient`)?.value.trim() || '';
-        return `${category}:${name}:${ingredient}`;
-      }).filter(item => item !== '::');
-      const hiddenInput = document.getElementById(targetId);
-      if (hiddenInput) hiddenInput.value = items.join(', ');
-    }
-    
-    
-    // ✅ 入力欄の変更イベント → hidden に反映
-    function bindInputEvents() {
-      document.querySelectorAll('.morning-select-type, .morning-input-name, .morning-input-ingredient').forEach(el => {
-        el.addEventListener('input', () => {
-          updateSimpleInputs('#morning-inputs', 'morning', 'id_morning_items');
-        });
-      });
-
-      document.querySelectorAll('.night-select-type, .night-input-name, .night-input-ingredient').forEach(el => {
-        el.addEventListener('input', () => {
-          updateSimpleInputs('#night-inputs', 'night', 'id_night_items');
-        });
-      });
-    }
-    
-    // ✅ 初期呼び出し
-    updateListeners();
-    renumberItems('#morning-inputs');
-    renumberItems('#night-inputs');
+    const row = document.createElement("div");
+    row.className = "item-row";
+    row.innerHTML = `
+      <div class="row-header">
+        <button type="button" class="remove-btn">－</button>
+        <label class="item-label">${count + 1}番目：</label>
+      </div>
+      <input type="text" class="${prefix}-input-category" value="${category}" placeholder="カテゴリ（例：化粧水）">
+      <input type="text" class="${prefix}-input-name" value="${name}" placeholder="商品名（任意）">
+      <input type="text" class="${prefix}-input-ingredient" value="${ingredient}" placeholder="成分（任意）">
+    `;
+    container.appendChild(row);
+    bindRemove();
     bindInputEvents();
+  }
 
-    // ✅ フォーム送信直前にもhiddenを更新
-    document.querySelector('form').addEventListener('submit', function () {
-      updateSimpleInputs('#morning-inputs', 'morning', 'id_morning_items');
-      updateSimpleInputs('#night-inputs', 'night', 'id_night_items');
+  function bindRemove() {
+    document.querySelectorAll('.remove-btn').forEach(btn => {
+      btn.onclick = () => {
+        const row = btn.closest('.item-row');
+        if (row) row.remove();
+      };
+    });
+  }
 
-        // デバッグ出力（必須）
-      console.log("💾 morning_items 保存前:", document.getElementById('id_morning_items').value);
-      console.log("💾 night_items 保存前:", document.getElementById('id_night_items').value);
+  function updateHiddenInputs(sectionId, prefix, targetId) {
+    const rows = document.querySelectorAll(`#${sectionId} .item-row`);
+    const items = Array.from(rows).map(row => {
+      const category = row.querySelector(`.${prefix}-input-category`)?.value.trim() || '';
+      const name = row.querySelector(`.${prefix}-input-name`)?.value.trim() || '';
+      const ingredient = row.querySelector(`.${prefix}-input-ingredient`)?.value.trim() || '';
+      return `${category}:${name}:${ingredient}`;
+    }).filter(item => item !== '::');
+    document.getElementById(targetId).value = items.join(', ');
+  }
 
-      // ✅ 成分（朝夜）の入力値をまとめて hidden に入れる
-      const allIngredients = document.querySelectorAll('.morning-input-ingredient, .night-input-ingredient');
-      const ingredientList = Array.from(allIngredients)
-        .map(i => i.value.trim())
-        .filter(Boolean)
-        .join(', ');
-      document.getElementById('id_ingredients').value = ingredientList;
+  function bindInputEvents() {
+    document.querySelectorAll('.morning-input-category, .morning-input-name, .morning-input-ingredient').forEach(el => {
+      el.addEventListener('input', () => {
+        updateHiddenInputs('morning-inputs', 'morning', 'id_morning_items');
+      });
+    });
+    document.querySelectorAll('.night-input-category, .night-input-name, .night-input-ingredient').forEach(el => {
+      el.addEventListener('input', () => {
+        updateHiddenInputs('night-inputs', 'night', 'id_night_items');
+      });
+    });
+  }
 
+  // ✅ 保存済みの内容を復元する関数
+  function loadExistingItems(csvStr, sectionId, prefix) {
+    const items = csvStr.split(',').map(s => s.trim()).filter(Boolean);
+    const container = document.getElementById(sectionId);
+    container.innerHTML = "";
 
+    items.forEach((item, index) => {
+      const parts = item.split(':');
+      const category = parts[0] || '';
+      const name = parts[1] || '';
+      const ingredient = parts[2] || '';
+      addItem(sectionId, prefix, category, name, ingredient);
     });
 
+    if (items.length === 0) {
+      for (let i = 0; i < 3; i++) addItem(sectionId, prefix);
+    }
+  }
+
+  // ✅ 呼び出し（初期値から復元）
+  const morningRaw = "{{ form.morning_items.value|escapejs }}";
+  const nightRaw = "{{ form.night_items.value|escapejs }}";
+  loadExistingItems(morningRaw, "morning-inputs", "morning");
+  loadExistingItems(nightRaw, "night-inputs", "night");
+
+  document.getElementById("add-morning-item").addEventListener("click", () => addItem("morning-inputs", "morning"));
+  document.getElementById("add-night-item").addEventListener("click", () => addItem("night-inputs", "night"));
+
+  document.querySelector('form').addEventListener('submit', function () {
+    updateHiddenInputs('morning-inputs', 'morning', 'id_morning_items');
+    updateHiddenInputs('night-inputs', 'night', 'id_night_items');
+    const ingredients = Array.from(document.querySelectorAll('.morning-input-ingredient, .night-input-ingredient'))
+      .map(i => i.value.trim()).filter(Boolean).join(', ');
+    document.getElementById('id_ingredients').value = ingredients;
+  });
+
+  // ✅ 写真プレビュー
+  const photoInput = document.getElementById("id_photo");
+  const previewBtn = document.getElementById("preview-button");
+  const previewImage = document.getElementById("preview-image");
+  if (previewBtn && photoInput && previewImage) {
+    previewBtn.addEventListener("click", function () {
+      const file = photoInput.files[0];
+      if (file) {
+        const reader = new FileReader();
+        reader.onload = function (e) {
+          previewImage.src = e.target.result;
+          previewImage.style.display = "block";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+  }
 
 });
-
-    
-
-
 </script>
-  
-  
-
-<p style="text-align:center;"><a href="{% url 'home' %}">← ホームに戻る</a></p>
-
 
 {% endblock %}

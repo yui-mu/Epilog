@@ -366,7 +366,7 @@ def chat_view(request):
                         receiver=advisor,
                         content=content
                     )
-        return redirect('chat')
+        return redirect('chat_detail', session_id=session.id)
 
     # アドバイザー用：全ユーザー一覧を渡す
     user_list = CustomUser.objects.filter(is_advisor=False) if user.is_advisor else None

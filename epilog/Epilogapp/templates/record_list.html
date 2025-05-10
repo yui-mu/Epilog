@@ -1,4 +1,5 @@
 {% extends 'base.html' %}
+{% load record_extras %}
 {% block content %}
 
 <h1 class="page-title">スキンケア記録の履歴一覧</h1>
@@ -62,9 +63,20 @@
           {% endif %}
         </p>
 
-        <p><strong>朝：</strong> {{ record.morning_items }}</p>
-        <p><strong>夜：</strong> {{ record.night_items }}</p>
+        <p><strong>朝：</strong>
+          {% for item in record.morning_items|parse_items %}
+            {{ item.category }}：{{ item.name }}{% if item.ingredient %}（{{ item.ingredient }}）{% endif %}
+            {% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </p>
 
+
+        <p><strong>夜：</strong>
+          {% for item in record.night_items|parse_items %}
+            {{ item.category }}：{{ item.name }}{% if item.ingredient %}（{{ item.ingredient }}）{% endif %}
+            {% if not forloop.last %}, {% endif %}
+          {% endfor %}
+        </p>
         <p><a href="{% url 'record_detail' record.pk %}">詳細を見る</a></p>
       </div>
     </div>
@@ -72,6 +84,7 @@
 </div>
 
 {% endblock %}
+
 
 
 
