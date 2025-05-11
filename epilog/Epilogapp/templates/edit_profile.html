@@ -1,27 +1,74 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<h1>プロフィールを編集</h1>
+  <h1>プロフィールを編集</h1>
 
-<form method="post" enctype="multipart/form-data" style="max-width: 600px; margin: auto;">
-  {% csrf_token %}
-  {{ profile_form.non_field_errors }}
-  {{ account_form.non_field_errors }}
+  <!-- メッセージ表示 -->
+  {% if messages %}
+    <ul style="padding: 10px; background-color: #e0f5e9; border: 1px solid #b2dfdb; border-radius: 5px;">
+      {% for message in messages %}
+        <li style="color: green;">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 
-  <fieldset style="margin-bottom: 30px;">
-    <legend>プロフィール情報</legend>
-    {{ profile_form.as_p }}
-  </fieldset>
+  <!-- エラーメッセージ表示 -->
+  {% if profile_form.errors or account_form.errors %}
+    <div style="color: red; margin-bottom: 15px;">
+      <p>入力に誤りがあります。内容を確認してください。</p>
+    </div>
+  {% endif %}
 
-  <fieldset style="margin-bottom: 30px;">
-    <legend>アカウント情報</legend>
-    {{ account_form.as_p }}
-  </fieldset>
+  <form method="post" enctype="multipart/form-data" action="" style="max-width: 600px; margin: auto;">
+    {% csrf_token %}
+    {{ profile_form.non_field_errors }}
+    {{ account_form.non_field_errors }}
 
-  <div style="text-align: center;">
-    <button type="submit" style="background-color: #a8d5c2; color: white; padding: 10px 20px; border: none; border-radius: 6px;">
-      保存する
-    </button>
-  </div>
-</form>
+    <fieldset style="margin-bottom: 30px;">
+      <legend>プロフィール情報</legend>
+
+      <p>
+        {{ profile_form.nickname.label_tag }}<br>
+        {{ profile_form.nickname }}
+        {% for error in profile_form.nickname.errors %}
+          <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+      </p>
+
+      <p>
+        {{ profile_form.age.label_tag }}<br>
+        {{ profile_form.age }}
+        {% for error in profile_form.age.errors %}
+          <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+      </p>
+
+      <p>
+        {{ profile_form.concerns.label_tag }}<br>
+        {{ profile_form.concerns }}
+        {% for error in profile_form.concerns.errors %}
+          <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+      </p>
+
+      <p>
+        {{ profile_form.profile_photo.label_tag }}<br>
+        {% if user.profile_photo %}
+          現在: {{ user.profile_photo.url }}<br>
+        {% endif %}
+        {{ profile_form.profile_photo }}
+        {% for error in profile_form.profile_photo.errors %}
+          <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+      </p>
+    </fieldset>
+
+    
+
+    <div style="text-align: center;">
+      <button type="submit" style="background-color: #a8d5c2; color: white; padding: 10px 20px; border: none; border-radius: 6px;">
+        保存する
+      </button>
+    </div>
+  </form>
 {% endblock %}

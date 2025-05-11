@@ -1,0 +1,51 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h1>アカウント編集画面</h1>
+
+{% if messages %}
+  <ul class="messages">
+    {% for message in messages %}
+      <li {% if message.tags %} class="{{ message.tags }}" {% endif %}>{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<form method="post" style="max-width: 500px; margin: auto;">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+
+  <div style="margin-bottom: 15px;">
+    <label for="id_email">現在のメールアドレス</label><br>
+    <input type="email" name="email" id="id_email" value="{{ user.email }}" readonly>
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <label for="id_new_email">新しいメールアドレス</label><br>
+    {{ form.new_email }}
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <label for="id_old_password">現在のパスワード</label><br>
+    {{ form.old_password }}
+  </div>
+
+  <div style="margin-bottom: 15px;">
+    <label for="id_new_password1">新しいパスワード</label><br>
+    {{ form.new_password1 }}
+    <p style="font-size: small;">8文字以上の英数字を含むパスワードを設定してください。</p>
+  </div>
+
+  <div style="margin-bottom: 25px;">
+    <label for="id_new_password2">新しいパスワード（再確認）</label><br>
+    {{ form.new_password2 }}
+    <p style="font-size: small;">確認のため、同じパスワードを入力してください。</p>
+  </div>
+
+  <div style="text-align: center;">
+    <button type="submit" style="background-color: #a8d5c2; color: white; padding: 10px 20px; border: none; border-radius: 5px;">
+      変更
+    </button>
+  </div>
+</form>
+{% endblock %}

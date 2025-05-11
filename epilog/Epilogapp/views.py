@@ -13,6 +13,7 @@ from django.views.decorators.http import require_POST
 from django.contrib import messages
 from django.contrib.auth import get_user_model
 from django.contrib.auth import authenticate, login
+from django.contrib.auth import update_session_auth_hash
 from collections import Counter
 from .forms import (
     CustomUserCreationForm, 
@@ -522,23 +523,24 @@ def profile_view(request):
 @login_required
 def edit_profile_view(request):
     user = request.user
+
     if request.method == 'POST':
         profile_form = ProfileForm(request.POST, request.FILES, instance=user)
-        account_form = UserEditForm(request.POST, instance=user)
-        if profile_form.is_valid() and account_form.is_valid():
+        #account_form = UserEditForm(request.POST, instance=user)
+
+        if profile_form.is_valid():
             profile_form.save()
-            account_form.save()
+            #account_form.save()
             messages.success(request, 'プロフィールを更新しました。')
             return redirect('profile')
     else:
         profile_form = ProfileForm(instance=user)
-        account_form = UserEditForm(instance=user)
+        #account_form = UserEditForm(instance=user)
 
     template_name = 'advisor/edit_profile.html' if user.is_advisor else 'edit_profile.html'
-
     return render(request, template_name, {
         'profile_form': profile_form,
-        'account_form': account_form,
+        #'account_form': account_form,
     })
 
 
@@ -548,13 +550,14 @@ User = get_user_model()
 def edit_account_view(request):
     user = request.user
     if request.method == 'POST':
-        form = EditAccountForm(request.POST, instance=user)
+        form = EditAccountForm(user, request.POST)
         if form.is_valid():
-            form.save()
+            user = form.save()
+            update_session_auth_hash(request, user)
             messages.success(request, 'アカウント情報を更新しました。')
             return redirect('profile')  # プロフィール画面に戻る
     else:
-        form = EditAccountForm(instance=user)
+        form = EditAccountForm(user)
 
     template_name = 'advisor/edit_account.html' if user.is_advisor else 'edit_account.html'
 

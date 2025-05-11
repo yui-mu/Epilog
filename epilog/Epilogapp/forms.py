@@ -1,6 +1,7 @@
 from django import forms
 from django.contrib.auth.forms import UserCreationForm
 from django.contrib.auth.forms import UserChangeForm
+from django.contrib.auth.forms import PasswordChangeForm
 from django.contrib.auth import get_user_model
 from .models import CustomUser
 from .models import SkincareRecord
@@ -113,12 +114,24 @@ class ProductSearchForm(forms.Form):
     )
     
 class ProfileForm(forms.ModelForm):
+    concerns = forms.ModelMultipleChoiceField(
+        queryset=Concern.objects.all(),
+        widget=forms.CheckboxSelectMultiple,
+        required=False,
+        label='肌悩み'
+    )
+
+    def save(self, commit=True):
+        instance = super().save(commit=False)
+        if commit:
+            instance.save()
+            self.save_m2m()
+        return instance
+
     class Meta:
         model = CustomUser
         fields = ['nickname', 'age', 'concerns', 'profile_photo']
-        widgets = {
-            'concerns': forms.CheckboxSelectMultiple,
-        }
+
         
 class UserEditForm(UserChangeForm):
     password = None  # パスワードは表示しない
@@ -144,14 +157,17 @@ class EditProfileForm(forms.ModelForm):
         
 User = get_user_model()
 
-class EditAccountForm(forms.ModelForm):
-    class Meta:
-        model = User
-        fields = ['username', 'email']
-        labels = {
-            'username': 'ユーザー名',
-            'email': 'メールアドレス',
-        }
+class EditAccountForm(PasswordChangeForm):
+    new_email = forms.EmailField(label='新しいメールアドレス', required=False)
+
+    def save(self, commit=True):
+        user = super().save(commit=True)  # パスワードを保存
+        new_email = self.cleaned_data.get('new_email')
+        if new_email:
+            user.email = new_email
+            if commit:
+                user.save()
+        return user
         
 class EmailLoginForm(forms.Form):
     email = forms.EmailField(label='メールアドレス', widget=forms.EmailInput(attrs={
