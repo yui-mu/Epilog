@@ -331,70 +331,76 @@ def chat_view(request):
     user = request.user
     advisor = None
     session = None
+    messages = []
 
     if not user.is_advisor:
+        # アドバイザーを1人取得（いないとNoneになるので注意）
         advisor = CustomUser.objects.filter(is_advisor=True).first()
-        session = ChatSession.objects.filter(user=user, status='active').first()
-        
+
+        # 最新のセッションを取得（activeに限定せず）
+        session = ChatSession.objects.filter(user=user).order_by('-created_at').first()
+
+        # セッションがあればメッセージを取得
         if session:
             messages = Message.objects.filter(session=session).order_by('timestamp')
-        else:
-            messages = []
-        
+
     else:
+        # アドバイザーは初期状態でメッセージ非表示
         messages = []
 
+    # POST処理（メッセージ送信）
     if request.method == 'POST':
         content = request.POST.get('content')
         if content:
             if user.is_advisor:
+                # アドバイザーは宛先を選ぶ形式
                 receiver_id = request.POST.get('receiver')
                 try:
                     receiver = CustomUser.objects.get(id=receiver_id)
                     Message.objects.create(sender=user, receiver=receiver, content=content)
                 except CustomUser.DoesNotExist:
-                    pass  
+                    pass
             else:
-            
+                # ユーザーは最新セッションの状態に応じて判断
                 latest_session = ChatSession.objects.filter(user=user).order_by('-created_at').first()
 
-                # ② 新規セッションを作るべきか判定
                 if latest_session is None or latest_session.status == 'completed':
-                    # 新しいセッションを作成（未割り当て）
+                    # セッションがない or 終了済み → 新規作成
                     session = ChatSession.objects.create(
                         user=user,
-                        advisor=None,
+                        advisor=advisor,
                         status='active',
                         created_at=timezone.now()
                     )
                 else:
-                    # 有効なセッションがまだ続いている
-                    session = latest_session 
+                    session = latest_session
 
-                # メッセージ送信（宛先は仮に advisor にしておく）
-                Message.objects.create(
-                    session=session,
-                    sender=user,
-                    receiver=advisor,
-                    content=content
-                )
-                    
-        
-        return redirect('chat_detail', session_id=session.id)
+                # advisorが取得できているか確認して送信
+                if advisor:
+                    Message.objects.create(
+                        session=session,
+                        sender=user,
+                        receiver=advisor,
+                        content=content
+                    )
 
-    # アドバイザー用：全ユーザー一覧を渡す
+        # セッションが存在していれば詳細画面へ遷移
+        if session:
+            return redirect('chat_detail', session_id=session.id)
+        else:
+            return redirect('chat')
+
+    # アドバイザーにはユーザー一覧を渡す
     user_list = CustomUser.objects.filter(is_advisor=False) if user.is_advisor else None
-    
-    if user.is_advisor:
-        chat_sessions = ChatSession.objects.filter(user=user).order_by('-created_at')
-    else:
-        chat_sessions = ChatSession.objects.filter(user=user).order_by('-created_at')
+
+    # 履歴は自分のものだけ表示
+    chat_sessions = ChatSession.objects.filter(user=user).order_by('-created_at')
 
     return render(request, 'chat.html', {
         'messages': messages,
         'user_list': user_list,
         'chat_sessions': chat_sessions,
-        'advisor': advisor, 
+        'advisor': advisor,
         'session': session,
     })
     

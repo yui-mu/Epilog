@@ -1,0 +1,10 @@
+{% extends 'advisor/advisor_base.html' %}
+{% block content %}
+<h2 style="text-align: center; margin-bottom: 30px;">アドバイザー用トップページ</h2>
+
+<div style="text-align: center;">
+  <a href="{% url 'unassigned_list' %}" class="btn">未対応相談一覧へ</a>
+  <a href="{% url 'advisor_active_chats' %}" class="btn">対応中チャットへ</a>
+</div>
+{% endblock %}
+
