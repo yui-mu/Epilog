@@ -32,11 +32,7 @@
           <div style="text-align: {% if msg.sender == request.user %}right{% else %}left{% endif %}; margin-bottom: 10px;">
             <div style="display: inline-block; padding: 8px 12px; border-radius: 10px;
               background-color: {% if msg.sender == request.user %}#e6f7ff{% else %}#f0f0f0{% endif %}; max-width: 70%;">
-              <strong>
-                <a href="{% url 'user_skincare_record_list' selected_session.user.id %}" target="_blank">
-                  {{ selected_session.user.username }}
-                </a>
-              </strong><br>
+              <strong>{{ msg.sender.username }}</strong><br>
               {{ msg.content }}<br>
               <small>{{ msg.timestamp|date:"Y-m-d H:i" }}</small>
             </div>
@@ -45,6 +41,7 @@
           <p>まだメッセージがありません。</p>
         {% endfor %}
       </div>
+
 
       <a href="{% url 'user_skincare_record_list' selected_session.user.id %}">
         {{ session.user.username }}

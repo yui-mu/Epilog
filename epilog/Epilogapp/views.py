@@ -368,6 +368,8 @@ def chat_view(request):
                         receiver=advisor,
                         content=content
                     )
+                    
+        
         return redirect('chat_detail', session_id=session.id)
 
     # アドバイザー用：全ユーザー一覧を渡す
