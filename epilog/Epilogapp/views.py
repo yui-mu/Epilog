@@ -366,16 +366,23 @@ def chat_view(request):
 
                 if latest_session is None or latest_session.status == 'completed':
                     # セッションがない or 終了済み → 新規作成
-                    session = ChatSession.objects.create(
-                        user=user,
-                        advisor=advisor,
-                        status='active',
-                        created_at=timezone.now()
-                    )
+                    if advisor:
+                        session = ChatSession.objects.create(
+                            user=user,
+                            advisor=advisor,
+                            status='active',
+                            created_at=timezone.now()
+                        )
+                    else:
+                        session = ChatSession.objects.create(
+                            user=user,
+                            status='active',
+                            created_at=timezone.now()
+                        )
                 else:
                     session = latest_session
 
-                # advisorが取得できているか確認して送信
+                # advisorがいるときだけ送信
                 if advisor:
                     Message.objects.create(
                         session=session,
@@ -403,6 +410,7 @@ def chat_view(request):
         'advisor': advisor,
         'session': session,
     })
+
     
 @login_required
 def chat_detail(request, session_id):
