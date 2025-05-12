@@ -15,5 +15,31 @@
         <p>チャット履歴のあるユーザーはいません。</p>
     {% endif %}
 
+    <hr>
+
+    <h2>終了したチャット一覧</h2>
+
+    {% if chat_sessions %}
+        <ul>
+            {% for session in chat_sessions %}
+                {% if session.status == 'completed' %}
+                    <li style="margin-bottom: 15px;">
+                        <strong>相手：</strong>
+                        {% if request.user == session.user %}
+                            {{ session.advisor.username }}
+                        {% else %}
+                            {{ session.user.username }}
+                        {% endif %}<br>
+                        <strong>開始：</strong> {{ session.created_at|date:"Y年m月d日 H:i" }}<br>
+                        <strong>終了：</strong> {{ session.ended_at|date:"Y年m月d日 H:i" }}<br>
+                        <a href="{% url 'chat_detail' session.id %}">チャット内容を見る</a>
+                    </li>
+                {% endif %}
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>終了したチャットはまだありません。</p>
+    {% endif %}
+
     <p><a href="{% url 'home' %}">← ホームに戻る</a></p>
 {% endblock %}

@@ -334,7 +334,7 @@ def chat_view(request):
 
     if not user.is_advisor:
         advisor = CustomUser.objects.filter(is_advisor=True).first()
-        session = ChatSession.objects.filter(user=user).first()
+        session = ChatSession.objects.filter(user=user, status='active').first()
         
         if session:
             messages = Message.objects.filter(session=session).order_by('timestamp')
@@ -357,11 +357,20 @@ def chat_view(request):
             else:
             
                 if advisor:
-                    session, _ = ChatSession.objects.get_or_create(
+                    session = ChatSession.objects.filter(
                         user=user,
-                        status='unassigned',
-                        defaults={'advisor': advisor}
-                    )
+                        advisor=advisor,
+                        status='active',
+                    ).first()
+                    
+                    if not session:
+                        session = ChatSession.objects.create(
+                            user=user,
+                            advisor=advisor,
+                            status='active',
+                            created_at=timezone.now()
+                        )
+                    
                     Message.objects.create(
                         session=session,
                         sender=user,
@@ -385,6 +394,7 @@ def chat_view(request):
         'user_list': user_list,
         'chat_sessions': chat_sessions,
         'advisor': advisor, 
+        'session': session,
     })
     
 @login_required
@@ -428,8 +438,18 @@ def chat_user_list_view(request):
             other_user_ids.add(receiver_id)
 
     users = CustomUser.objects.filter(id__in=other_user_ids)
+    
+    from .models import ChatSession
+    chat_sessions = ChatSession.objects.filter(
+        advisor=user,
+        status='completed'
+    ).order_by('-ended_at')
 
-    return render(request, 'chat_user_list.html', {'users': users})
+    return render(request, 'chat_user_list.html', {
+        'users': users,
+        'chat_sessions': chat_sessions,  # 👈 追加
+    })
+
 
 @login_required
 def chat_with_user_view(request, user_id):
@@ -461,7 +481,7 @@ def chat_with_user_view(request, user_id):
     
 @login_required
 def advisor_unassigned_list(request):
-    sessions = ChatSession.objects.filter(status='unassigned').order_by('-created_at')
+    sessions = ChatSession.objects.filter(status__in=['unassigned', 'active']).order_by('-created_at')
     print("取得された未対応セッション:", sessions)
     for session in sessions:
         session.latest_message = session.messages.order_by('-timestamp').first()
@@ -749,3 +769,47 @@ def chat_dashboard_view(request, session_id=None):
         'messages': messages,
     })
 
+
+#5/12履歴一覧修正下記追記
+
+@login_required
+@require_POST
+def send_message(request):
+    content = request.POST.get('content')
+    advisor_id = request.POST.get('advisor_id')
+
+    if not content or not advisor_id:
+        return redirect('home')
+
+    advisor = get_object_or_404(CustomUser, id=advisor_id)
+
+    # すでにアクティブなセッションがあるか確認
+    session, created = ChatSession.objects.get_or_create(
+        user=request.user,
+        advisor=advisor,
+        status='active',
+        defaults={'created_at': timezone.now()}
+    )
+
+    # メッセージを保存
+    Message.objects.create(
+        session=session,
+        sender=request.user,
+        receiver=advisor,
+        content=content
+    )
+
+    return redirect('chat', session_id=session.id)
+
+@login_required
+@require_POST
+def end_chat_session(request, session_id):
+    session = get_object_or_404(ChatSession, id=session_id)
+
+    # 本人確認：ユーザーまたはアドバイザーのみが終了可能
+    if request.user == session.user or request.user == session.advisor:
+        session.status = 'completed'
+        session.ended_at = timezone.now()
+        session.save()
+
+    return redirect('chat_user_list')  # 終了後は履歴一覧へ

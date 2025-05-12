@@ -59,11 +59,16 @@
       <button type="submit">送信</button>
     </form>
 
-    <!-- チャット終了ボタン -->
-    <form method="post" action="{% url 'chat_end' %}">
+
+    
+    <!-- チャット終了ボタン --><!-- 5/12修正 -->
+    {% if session and session.status == 'active' %}
+    <form method="post" action="{% url 'end_chat_session' session.id %}">
       {% csrf_token %}
-      <button type="submit" style="margin-top:10px; background-color: #ccc;">終了</button>
+      <button type="submit" style="margin-top:10px; background-color: #ccc;">チャットを終了する</button>
     </form>
+    {% endif %}
+
   </div>
 
 </div>
