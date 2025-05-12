@@ -356,27 +356,28 @@ def chat_view(request):
                     pass  
             else:
             
-                if advisor:
-                    session = ChatSession.objects.filter(
+                latest_session = ChatSession.objects.filter(user=user).order_by('-created_at').first()
+
+                # ② 新規セッションを作るべきか判定
+                if latest_session is None or latest_session.status == 'completed':
+                    # 新しいセッションを作成（未割り当て）
+                    session = ChatSession.objects.create(
                         user=user,
-                        advisor=advisor,
+                        advisor=None,
                         status='active',
-                    ).first()
-                    
-                    if not session:
-                        session = ChatSession.objects.create(
-                            user=user,
-                            advisor=advisor,
-                            status='active',
-                            created_at=timezone.now()
-                        )
-                    
-                    Message.objects.create(
-                        session=session,
-                        sender=user,
-                        receiver=advisor,
-                        content=content
+                        created_at=timezone.now()
                     )
+                else:
+                    # 有効なセッションがまだ続いている
+                    session = latest_session 
+
+                # メッセージ送信（宛先は仮に advisor にしておく）
+                Message.objects.create(
+                    session=session,
+                    sender=user,
+                    receiver=advisor,
+                    content=content
+                )
                     
         
         return redirect('chat_detail', session_id=session.id)
@@ -481,12 +482,21 @@ def chat_with_user_view(request, user_id):
     
 @login_required
 def advisor_unassigned_list(request):
-    sessions = ChatSession.objects.filter(status__in=['unassigned', 'active']).order_by('-created_at')
+    # 未対応：まだアドバイザーが設定されておらず、ユーザーから最後にメッセージが届いたセッション
+    sessions = ChatSession.objects.filter(
+        advisor__isnull=True,
+        status='active'  # ← メッセージが送られた時点でactiveに変更される想定
+    ).order_by('-created_at')
+
     print("取得された未対応セッション:", sessions)
+    
     for session in sessions:
         session.latest_message = session.messages.order_by('-timestamp').first()
         print("ユーザー:", session.user, "最新メッセージ:", session.latest_message)
+    
     return render(request, 'advisor/unassigned_list.html', {'sessions': sessions})
+
+
 
 
 @login_required
@@ -609,10 +619,16 @@ def toggle_favorite_ajax(request):
 @login_required
 def advisor_start_chat(request, session_id):
     session = get_object_or_404(ChatSession, id=session_id)
-    session.advisor = request.user
-    session.status = 'active'
-    session.started_at = timezone.now()
-    session.save()
+    
+    # すでにアドバイザーが割り当てられていなければ割り当てる
+    if session.advisor is None:
+        session.advisor = request.user
+    
+    if session.status == 'unassigned':
+        session.advisor = request.user
+        session.status = 'active'
+        session.started_at = timezone.now()
+        session.save()
     return redirect(f"{reverse('advisor_active_chats')}?session_id={session.id}")
  
 
@@ -628,20 +644,32 @@ def advisor_active_chats(request, session_id=None):
     session_id = request.GET.get('session_id')
 
     if session_id:
-        selected_session = get_object_or_404(ChatSession, id=session_id, advisor=request.user)
-        messages = selected_session.messages.order_by('timestamp')
+        try:
+            selected_session = ChatSession.objects.get(id=session_id)
+            # まだアドバイザーが設定されていない場合、自分を設定
+            if selected_session.advisor is None:
+                selected_session.advisor = request.user
+                selected_session.status = 'active'
+                selected_session.started_at = timezone.now()
+                selected_session.save()
+            # もし他のアドバイザーが担当中なら表示させない（安全）
+            elif selected_session.advisor != request.user:
+                return redirect('advisor_unassigned_list')
 
-        if request.method == 'POST':
-            content = request.POST.get('content')
-            if content:
-                Message.objects.create(
-                    session=selected_session,
-                    sender=request.user,
-                    receiver=selected_session.user,
-                    content=content
-                )
-                return redirect(f"{reverse('advisor_active_chats')}?session_id={session_id}")
+            messages = selected_session.messages.order_by('timestamp')
 
+            if request.method == 'POST':
+                content = request.POST.get('content')
+                if content:
+                    Message.objects.create(
+                        session=selected_session,
+                        sender=request.user,
+                        receiver=selected_session.user,
+                        content=content
+                    )
+                    return redirect(f"{reverse('advisor_active_chats')}?session_id={session_id}")
+        except ChatSession.DoesNotExist:
+            return redirect('advisor_unassigned_list')
     return render(request, 'advisor/chat_dashboard.html', {
         'active_sessions': active_sessions,
         'selected_session': selected_session,
