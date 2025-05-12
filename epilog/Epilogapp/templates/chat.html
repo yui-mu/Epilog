@@ -42,7 +42,7 @@
   </div>
 
 
-    <form method="post">
+    <form method="post" action="{% url 'chat' %}">
       {% csrf_token %}
 
       {% if user_list %}
