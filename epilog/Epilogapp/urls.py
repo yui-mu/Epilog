@@ -98,5 +98,8 @@ urlpatterns = [
     path('advisor/chat/<int:session_id>/', views.advisor_active_chats, name='advisor_chat_dashboard_with_session'),
     path('advisor/chat/', views.advisor_active_chats, name='advisor_active_chats'),
     path('advisor/<int:user_id>/profile/', views.advisor_profile, name='advisor_profile'),
+    path('advisor/user/<int:user_id>/skincare_records/', views.user_skincare_record_list_view, name='user_skincare_record_list'),
+    path('user/<int:user_id>/profile/', views.user_profile, name='user_profile')
+
 
 ]

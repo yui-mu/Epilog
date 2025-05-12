@@ -1,5 +1,5 @@
-{% extends 'base.html' %}
-   
+{% extends "advisor/advisor_base.html" %}
+ 
 {% block content %}
     <h1>{{ target_user.nickname }} さんのスキンケア記録一覧</h1>
 
@@ -18,5 +18,5 @@
         <p>記録がまだありません。</p>
     {% endif %}
 
-    <p><a href="{% url 'chat_with_user' target_user.id %}">← チャットに戻る</a></p>
+    <a href="{% url 'advisor_active_chats' %}?session_id={{ request.GET.session_id }}">← チャットに戻る</a>
 {% endblock %}

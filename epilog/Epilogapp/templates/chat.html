@@ -27,7 +27,16 @@
     <div style="border:1px solid #ccc; padding:10px; height:300px; overflow-y:scroll; margin-bottom:20px;">
     {% for msg in messages %}
       {% if msg.sender.id == request.user.id or msg.receiver.id == request.user.id %}
-        <p><strong>{{ msg.sender.username }}</strong>: {{ msg.content }}<br><small>{{ msg.timestamp }}</small></p>
+        <p>
+          {% if msg.sender.is_advisor %}
+            <strong>
+              <a href="{% url 'advisor_profile' user_id=msg.sender.id %}">{{ msg.sender.username }}</a>
+            </strong>
+          {% else %}
+            <strong>{{ msg.sender.username }}</strong>
+          {% endif %}
+          : {{ msg.content }}<br><small>{{ msg.timestamp }}</small>
+        </p>
       {% endif %}
     {% endfor %}
   </div>

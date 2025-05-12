@@ -1,0 +1,23 @@
+{% extends "advisor/advisor_base.html" %}
+{% load static %}
+
+{% block content %}
+<h2>ユーザープロフィール</h2>
+
+<div style="text-align: center;">
+  {% if user.profile_photo %}
+    <img src="{{ user.profile_photo.url }}" alt="プロフィール画像" style="width:150px; height:150px; border-radius: 50%;">
+  {% else %}
+    <img src="{% static 'images/default_profile.png' %}" alt="デフォルト画像" style="width:150px; height:150px; border-radius: 50%;">
+  {% endif %}
+
+  <p><strong>ニックネーム：</strong>{{ user.nickname }}</p>
+  <p><strong>年齢：</strong>{{ user.age }}歳</p>
+  <p><strong>肌悩み：</strong>{{ user.concerns.all|join:", " }}</p>
+
+  <a href="{% url 'user_skincare_record_list' user.id %}">
+    <button style="margin-top: 15px;">スキンケア記録一覧を見る</button>
+  </a>
+
+</div>
+{% endblock %}

@@ -841,3 +841,19 @@ def end_chat_session(request, session_id):
         session.save()
 
     return redirect('chat_user_list')  # 終了後は履歴一覧へ
+
+@login_required
+def user_profile(request, user_id):
+    user = get_object_or_404(CustomUser, id=user_id)
+
+    # ログイン中のユーザーが対象ユーザー自身なら編集用画面を表示
+    if request.user == user:
+        return render(request, 'profile.html', {'user': user})
+    
+    # アドバイザーが見るときは別テンプレートで表示（編集ボタンなどは非表示）
+    elif request.user.is_advisor:
+        return render(request, 'advisor/user_profile_for_advisor.html', {'user': user})
+
+    # それ以外は許可しない（例：他人のプロフィールを見ようとしたユーザーなど）
+    else:
+        return redirect('home')
