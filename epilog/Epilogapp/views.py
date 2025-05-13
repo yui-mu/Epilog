@@ -829,9 +829,12 @@ def send_message(request):
     session, created = ChatSession.objects.get_or_create(
         user=request.user,
         advisor=advisor,
-        status='active',
-        defaults={'created_at': timezone.now()}
+        defaults={
+            'status': 'active',  # ← 作るときにこの初期値を設定する
+            'created_at': timezone.now()
+        }
     )
+
 
     # メッセージを保存
     Message.objects.create(
