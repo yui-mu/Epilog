@@ -336,6 +336,8 @@ def chat_view(request):
     if not user.is_advisor:
         # アドバイザーを1人取得（いないとNoneになるので注意）
         advisor = CustomUser.objects.filter(is_advisor=True).first()
+        if not advisor:
+            return redirect('chat')  # エラーメッセージ追加もOK
 
         # 最新のセッションを取得（activeに限定せず）
         session = ChatSession.objects.filter(user=user).order_by('-created_at').first()
@@ -362,34 +364,31 @@ def chat_view(request):
                     pass
             else:
                 # ユーザーは最新セッションの状態に応じて判断
+                advisor = CustomUser.objects.filter(is_advisor=True).first()
+                if not advisor:
+                    messages.error(request, "現在、対応可能なアドバイザーがいません。")
+                    return redirect('chat')
+
                 latest_session = ChatSession.objects.filter(user=user).order_by('-created_at').first()
 
                 if latest_session is None or latest_session.status == 'completed':
                     # セッションがない or 終了済み → 新規作成
-                    if advisor:
-                        session = ChatSession.objects.create(
-                            user=user,
-                            advisor=advisor,
-                            status='active',
-                            created_at=timezone.now()
-                        )
-                    else:
-                        session = ChatSession.objects.create(
-                            user=user,
-                            status='active',
-                            created_at=timezone.now()
-                        )
+                    session = ChatSession.objects.create(
+                        user=user,
+                        #advisor=advisor,
+                        status='active',
+                        created_at=timezone.now()
+                    )
                 else:
                     session = latest_session
 
-                # advisorがいるときだけ送信
-                if advisor:
-                    Message.objects.create(
-                        session=session,
-                        sender=user,
-                        receiver=advisor,
-                        content=content
-                    )
+                # メッセージを作成
+                Message.objects.create(
+                    session=session,
+                    sender=user,
+                    receiver=advisor,
+                    content=content
+                )
 
         # セッションが存在していれば詳細画面へ遷移
         if session:
@@ -410,6 +409,7 @@ def chat_view(request):
         'advisor': advisor,
         'session': session,
     })
+
 
     
 @login_required
