@@ -19,11 +19,12 @@
         <div style="margin-bottom: 10px;
                     text-align: {% if msg.sender == request.user %}right{% else %}left{% endif %};">
             <div style="display: inline-block;
-                        padding: 10px;
+                        padding: 4px 8px;
                         border-radius: 12px;
+                        white-space: pre-wrap;
                         background-color: {% if msg.sender == request.user %}#d1f0d1{% else %}#e0e0e0{% endif %};">
                 <strong>{{ msg.sender.username }}</strong><br>
-                {{ msg.content }}<br>
+                {{ msg.content|linebreaksbr }}<br>
                 <small>{{ msg.timestamp|date:"Y年m月d日 H:i" }}</small>
             </div>
         </div>

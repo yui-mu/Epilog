@@ -35,7 +35,7 @@
           {% else %}
             <strong>{{ msg.sender.username }}</strong>
           {% endif %}
-          : {{ msg.content }}<br><small>{{ msg.timestamp }}</small>
+          : {{ msg.content|linebreaksbr }}<br><small>{{ msg.timestamp }}</small>
         </p>
       {% endif %}
     {% endfor %}
