@@ -291,10 +291,10 @@ def product_search_view(request):
             products = products.filter(category=category)
 
         if concern:
-            products = products.filter(concerns=concern)
+            products = products.filter(concerns__id=concern.id)
 
         if skin_type:
-            products = products.filter(skin_types=skin_type)
+            products = products.filter(skin_types__id=skin_type.id)
 
         if feature:
             products = products.filter(features__name__icontains=feature).distinct()

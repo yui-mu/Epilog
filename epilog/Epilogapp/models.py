@@ -110,6 +110,8 @@ class Product(models.Model):
 
     ingredients = models.ManyToManyField(Ingredient, blank=True, verbose_name="配合成分")
     concerns = models.ManyToManyField(Concern, blank=True, verbose_name="対応する肌悩み")
+    skin_types = models.ManyToManyField('SkinType', blank=True, verbose_name="対応する肌質")
+    
     created_at = models.DateTimeField("作成日", auto_now_add=True)
     updated_at = models.DateTimeField("更新日", auto_now=True)
 
