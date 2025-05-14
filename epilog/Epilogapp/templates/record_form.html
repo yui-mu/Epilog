@@ -87,7 +87,7 @@ document.addEventListener("DOMContentLoaded", function () {
         <label class="item-label">${count + 1}番目：</label>
       </div>
       <input type="text" class="${prefix}-input-category" value="${category}" placeholder="カテゴリ（例：化粧水）">
-      <input type="text" class="${prefix}-input-name" value="${name}" placeholder="商品名（任意）">
+      <input type="text" class="${prefix}-input-name" value="${name}" placeholder="商品名">
       <input type="text" class="${prefix}-input-ingredient" value="${ingredient}" placeholder="成分（任意）">
     `;
     container.appendChild(row);
@@ -136,7 +136,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
     items.forEach((item, index) => {
       const parts = item.split(':');
-      const category = parts[0] || '';
+      const category = (parts[0] && parts[0] !== 'None') ? parts[0] : '';
       const name = parts[1] || '';
       const ingredient = parts[2] || '';
       addItem(sectionId, prefix, category, name, ingredient);
