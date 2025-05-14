@@ -297,7 +297,7 @@ def product_search_view(request):
             products = products.filter(skin_types__id=skin_type.id)
 
         if feature:
-            products = products.filter(features__name__icontains=feature).distinct()
+            products = products.filter(features__icontains=feature)
             
     favorite_ids = Favorite.objects.filter(user=request.user).values_list('product_id', flat=True)
 
