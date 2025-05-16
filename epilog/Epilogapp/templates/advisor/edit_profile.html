@@ -2,89 +2,87 @@
 {% load static %}
 
 {% block content %}
-  <h1 class="page-title">プロフィールを編集</h1>
+<h1 class="page-title">プロフィールを編集</h1>
 
-  <!-- メッセージ表示 -->
-  {% if messages %}
-    <ul style="padding: 10px; background-color: #e0f5e9; border: 1px solid #b2dfdb; border-radius: 5px;">
-      {% for message in messages %}
-        <li style="color: green;">{{ message }}</li>
+<!-- 成功メッセージ -->
+{% if messages %}
+  <ul style="padding: 10px; background-color: #e0f5e9; border: 1px solid #b2dfdb; border-radius: 5px;">
+    {% for message in messages %}
+      <li style="color: green;">{{ message }}</li>
+    {% endfor %}
+  </ul>
+{% endif %}
+
+<!-- エラーメッセージ -->
+{% if form.errors %}
+  <div style="color: red; margin-bottom: 15px;">
+    <p>入力に誤りがあります。内容を確認してください。</p>
+  </div>
+{% endif %}
+
+<!-- プロフィール編集フォーム -->
+<form method="post" enctype="multipart/form-data" style="max-width: 600px; margin: auto;">
+  {% csrf_token %}
+  {{ form.non_field_errors }}
+
+  <fieldset style="margin-bottom: 30px;">
+    <legend>プロフィール情報</legend>
+
+    <p>
+      {{ form.nickname.label_tag }}<br>
+      {{ form.nickname }}
+      {% for error in form.nickname.errors %}
+        <span style="color: red;">{{ error }}</span>
       {% endfor %}
-    </ul>
-  {% endif %}
+    </p>
 
-  <!-- エラーメッセージ -->
-  {% if form.errors %}
-    <div style="color: red; margin-bottom: 15px;">
-      <p>入力に誤りがあります。内容を確認してください。</p>
-    </div>
-  {% endif %}
+    <p>
+      {{ form.expertise.label_tag }}<br>
+      {{ form.expertise }}
+      {% for error in form.expertise.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
+    </p>
 
-  <form method="post" enctype="multipart/form-data" style="max-width: 600px; margin: auto;">
-    {% csrf_token %}
-    {{ form.non_field_errors }}
+    <p>
+      {{ form.certification.label_tag }}<br>
+      {{ form.certification }}
+      {% for error in form.certification.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
+    </p>
 
-    <fieldset style="margin-bottom: 30px;">
-      <legend>プロフィール情報</legend>
+    <p>
+      {{ form.available_time.label_tag }}<br>
+      {{ form.available_time }}
+      {% for error in form.available_time.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
+    </p>
 
-      <!-- 名前 -->
-      <p>
-        {{ form.nickname.label_tag }}<br>
-        {{ form.nickname }}
-        {% for error in form.nickname.errors %}
-          <span style="color: red;">{{ error }}</span>
-        {% endfor %}
-      </p>
+    <p>
+      {{ form.profile_photo.label_tag }}<br>
+      {% if form.instance.profile_photo %}
+        <img src="{{ form.instance.profile_photo.url }}" alt="プロフィール画像" style="width: 150px; height: 150px; border-radius: 8px;"><br>
+      {% else %}
+        デフォルト画像が使用されています。<br>
+      {% endif %}
+      {{ form.profile_photo }}
+      {% for error in form.profile_photo.errors %}
+        <span style="color: red;">{{ error }}</span>
+      {% endfor %}
+    </p>
+  </fieldset>
 
-      <!-- 専門分野 -->
-      <p>
-        {{ form.expertise.label_tag }}<br>
-        {{ form.expertise }}
-        {% for error in form.expertise.errors %}
-          <span style="color: red;">{{ error }}</span>
-        {% endfor %}
-      </p>
-
-      <!-- 資格 -->
-      <p>
-        {{ form.certification.label_tag }}<br>
-        {{ form.certification }}
-        {% for error in form.certification.errors %}
-          <span style="color: red;">{{ error }}</span>
-        {% endfor %}
-      </p>
-
-      <!-- 対応可能時間 -->
-      <p>
-        {{ form.available_time.label_tag }}<br>
-        {{ form.available_time }}
-        {% for error in form.available_time.errors %}
-          <span style="color: red;">{{ error }}</span>
-        {% endfor %}
-      </p>
-
-      <!-- プロフィール画像 -->
-      <p>
-        {{ form.profile_photo.label_tag }}<br>
-        {% if user.profile_photo %}
-          <img src="{{ user.profile_photo.url }}" alt="プロフィール画像" style="width: 150px; height: 150px; border-radius: 8px;"><br>
-        {% else %}
-          デフォルト画像が使用されています。<br>
-        {% endif %}
-        {{ form.profile_photo }}
-        {% for error in form.profile_photo.errors %}
-          <span style="color: red;">{{ error }}</span>
-        {% endfor %}
-      </p>
-    </fieldset>
-
-    <div style="text-align: center;">
-      <button type="submit" style="background-color: #a8d5c2; color: white; padding: 10px 20px; border: none; border-radius: 6px;">
-        保存する
-      </button>
-    </div>
-  </form>
+  <div style="text-align: center;">
+    <button type="submit" style="background-color: #a8d5c2; color: white; padding: 10px 20px; border: none; border-radius: 6px;">
+      保存する
+    </button>
+  </div>
+</form>
 {% endblock %}
+
+
 
 
 
