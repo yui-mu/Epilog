@@ -1,26 +1,88 @@
 {% extends "base_advisor.html" %}
+{% load static %}
 
 {% block navigation %}
-<nav style="display: flex; align-items: center; justify-content: space-between;">
-  <div style="display: flex; align-items: center; gap: 12px;">
-    <span style="font-weight: bold; color: #2e5947; font-size: 1.2rem;">EpiLog</span>
-    <a href="{% url 'advisor_unassigned_list' %}">未対応相談一覧</a>
-    <a href="{% url 'advisor_active_chats' %}">チャット対応中</a>
-    <a href="{% url 'advisor_completed_chats' %}">チャット対応済</a>
-    <a href="{% url 'advisor_profile' %}">プロフィール</a>
-  </div>
-  <div>
-    <form method="post" action="{% url 'logout' %}" style="display:inline;">
-      {% csrf_token %}
-      <button type="submit" style="padding: 6px 12px;">ログアウト</button>
-    </form>
-  </div>
-</nav>
-{% load static %}
-<script src="{% static 'Epilogapp/js/chat.js' %}"></script>
+  <style>
+    body {
+      font-family: "Noto Sans JP", sans-serif;
+      background-color: #f5f9f6;
+      color: #333;
+      margin: 0;
+      padding: 20px;
+    }
+
+    nav {
+      background-color: #e0ebe3;
+      padding: 10px 20px;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      align-items: center;
+      margin-bottom: 30px;
+      border-bottom: 1px solid #c1d4c9;
+    }
+
+    nav a {
+      background-color: #a7d7c5;
+      color: white;
+      padding: 10px 16px;
+      border-radius: 8px;
+      text-decoration: none;
+      transition: background-color 0.3s;
+    }
+
+    nav a:hover {
+      background-color: #86cbb0;
+    }
+
+    button {
+      background-color: #a7d7c5;
+      color: white;
+      padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover {
+      background-color: #86cbb0;
+    }
+
+    .container {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .page-title {
+      text-align: center;
+      font-size: 28px;
+      font-weight: bold;
+      margin-bottom: 30px;
+    }
+  </style>
+
+  <nav style="display: flex; align-items: center; justify-content: space-between;">
+    <div style="display: flex; align-items: center; gap: 12px;">
+      <span style="font-weight: bold; color: #2e5947; font-size: 1.2rem;">EpiLog</span>
+      <a href="{% url 'advisor_unassigned_list' %}">未対応相談一覧</a>
+      <a href="{% url 'advisor_active_chats' %}">チャット対応中</a>
+      <a href="{% url 'advisor_completed_chats' %}">チャット対応済</a>
+      <a href="{% url 'advisor_profile' %}">プロフィール</a>
+    </div>
+    <div>
+      <form method="post" action="{% url 'logout' %}" style="display:inline;">
+        {% csrf_token %}
+        <button type="submit">ログアウト</button>
+      </form>
+    </div>
+  </nav>
+
+  
+
+  <script src="{% static 'Epilogapp/js/chat.js' %}"></script>
 {% endblock %}
-<p style="text-align: right; font-size: 0.9em; color: #444; margin: 0 0 10px;">
-    ログイン中：<strong>{{ user.nickname }}</strong> さん
-</p>
+
 
 

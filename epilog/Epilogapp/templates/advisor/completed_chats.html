@@ -3,17 +3,20 @@
 {% block content %}
 <h2>チャット対応済</h2>
 
-<ul>
+<ul style="list-style: none; padding: 0;">
   {% for session in sessions %}
-    <li>
+    <li style="margin-bottom: 10px;">
       {{ session.user.username }} さん（{{ session.ended_at|date:"Y-m-d H:i" }} 終了）
-      - <a href="{% url 'advisor_active_chats' %}?session_id={{ session.id }}">詳細</a>
+      <a href="{% url 'advisor_active_chats' %}?session_id={{ session.id }}"
+         style="background-color: #a7d7c5; color: white; padding: 6px 12px; border-radius: 6px;
+                text-decoration: none; font-size: 0.9rem; margin-left: 8px;">
+        詳細
+      </a>
     </li>
   {% empty %}
     <li>対応済みのチャットはありません。</li>
   {% endfor %}
 </ul>
-
 
 <a href="{% url 'advisor_active_chats' %}">← チャット対応中へ戻る</a>
 {% endblock %}

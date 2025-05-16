@@ -54,7 +54,7 @@
       <p>
         {{ profile_form.profile_photo.label_tag }}<br>
         {% if user.profile_photo %}
-          現在: {{ user.profile_photo.url }}<br>
+          <img src="{{ user.profile_photo.url }}" alt="プロフィール画像" style="width: 150px; height: 150px; border-radius: 8px;"><br>
         {% endif %}
         {{ profile_form.profile_photo }}
         {% for error in profile_form.profile_photo.errors %}

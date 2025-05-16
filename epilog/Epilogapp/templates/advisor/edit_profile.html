@@ -2,49 +2,89 @@
 {% load static %}
 
 {% block content %}
-<h2 style="margin-bottom: 20px;">プロフィール編集</h2>
+  <h1 class="page-title">プロフィールを編集</h1>
 
-<form method="POST" enctype="multipart/form-data" style="max-width: 600px;">
-  {% csrf_token %}
+  <!-- メッセージ表示 -->
+  {% if messages %}
+    <ul style="padding: 10px; background-color: #e0f5e9; border: 1px solid #b2dfdb; border-radius: 5px;">
+      {% for message in messages %}
+        <li style="color: green;">{{ message }}</li>
+      {% endfor %}
+    </ul>
+  {% endif %}
 
-  <!-- プロフィール画像 -->
-  <div style="margin-bottom: 20px;">
-    <label><strong>プロフィール画像：</strong></label><br>
-    {% if user.profile_photo %}
-      <img src="{{ user.profile_photo.url }}" alt="現在の画像" style="width: 150px; height: 150px; border-radius: 50%;">
-    {% else %}
-      <img src="{% static 'images/default_profile.png' %}" alt="デフォルト画像" style="width: 150px; height: 150px; border-radius: 50%;">
-    {% endif %}
-    <br>
-    {{ form.profile_photo }}
-  </div>
+  <!-- エラーメッセージ -->
+  {% if form.errors %}
+    <div style="color: red; margin-bottom: 15px;">
+      <p>入力に誤りがあります。内容を確認してください。</p>
+    </div>
+  {% endif %}
 
-  <!-- 名前 -->
-  <div style="margin-bottom: 15px;">
-    <label><strong>名前：</strong></label><br>
-    {{ form.nickname }}
-  </div>
+  <form method="post" enctype="multipart/form-data" style="max-width: 600px; margin: auto;">
+    {% csrf_token %}
+    {{ form.non_field_errors }}
 
-  <!-- 専門分野（カンマ区切り入力） -->
-  <div style="margin-bottom: 15px;">
-    <label><strong>専門分野：</strong><br><small>※例: 肌タイプ別の専門分野,成分に関する専門分野</small></label><br>
-    {{ form.expertise }}
-  </div>
+    <fieldset style="margin-bottom: 30px;">
+      <legend>プロフィール情報</legend>
 
-  <!-- 資格 -->
-  <div style="margin-bottom: 15px;">
-    <label><strong>資格：</strong></label><br>
-    {{ form.certification }}
-  </div>
+      <!-- 名前 -->
+      <p>
+        {{ form.nickname.label_tag }}<br>
+        {{ form.nickname }}
+        {% for error in form.nickname.errors %}
+          <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+      </p>
 
-  <!-- 対応可能時間 -->
-  <div style="margin-bottom: 15px;">
-    <label><strong>対応可能時間：</strong></label><br>
-    {{ form.available_time }}
-  </div>
+      <!-- 専門分野 -->
+      <p>
+        {{ form.expertise.label_tag }}<br>
+        {{ form.expertise }}
+        {% for error in form.expertise.errors %}
+          <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+      </p>
 
-  <button type="submit" class="btn btn-primary">保存</button>
-</form>
+      <!-- 資格 -->
+      <p>
+        {{ form.certification.label_tag }}<br>
+        {{ form.certification }}
+        {% for error in form.certification.errors %}
+          <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+      </p>
+
+      <!-- 対応可能時間 -->
+      <p>
+        {{ form.available_time.label_tag }}<br>
+        {{ form.available_time }}
+        {% for error in form.available_time.errors %}
+          <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+      </p>
+
+      <!-- プロフィール画像 -->
+      <p>
+        {{ form.profile_photo.label_tag }}<br>
+        {% if user.profile_photo %}
+          <img src="{{ user.profile_photo.url }}" alt="プロフィール画像" style="width: 150px; height: 150px; border-radius: 8px;"><br>
+        {% else %}
+          デフォルト画像が使用されています。<br>
+        {% endif %}
+        {{ form.profile_photo }}
+        {% for error in form.profile_photo.errors %}
+          <span style="color: red;">{{ error }}</span>
+        {% endfor %}
+      </p>
+    </fieldset>
+
+    <div style="text-align: center;">
+      <button type="submit" style="background-color: #a8d5c2; color: white; padding: 10px 20px; border: none; border-radius: 6px;">
+        保存する
+      </button>
+    </div>
+  </form>
 {% endblock %}
+
 
 

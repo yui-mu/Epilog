@@ -24,22 +24,27 @@
 
   <!-- 右カラム：チャット内容 -->
   <div class="chat-main" style="width: 65%;">
-    <div style="border:1px solid #ccc; padding:10px; height:300px; overflow-y:scroll; margin-bottom:20px;">
+    <div style="border:1px solid #ccc; padding:10px; height:500px; overflow-y:scroll; margin-bottom:20px;">
     {% for msg in messages %}
       {% if msg.sender.id == request.user.id or msg.receiver.id == request.user.id %}
-        <p>
-          {% if msg.sender.is_advisor %}
+        <div style="text-align: {% if msg.sender == request.user %}right{% else %}left{% endif %}; margin-bottom: 10px;">
+          <div style="display: inline-block; padding: 8px 12px; border-radius: 10px;
+            background-color: {% if msg.sender == request.user %}#e6f7ff{% else %}#f0f0f0{% endif %}; max-width: 70%;">
             <strong>
-              <a href="{% url 'advisor_profile' user_id=msg.sender.id %}">{{ msg.sender.username }}</a>
-            </strong>
-          {% else %}
-            <strong>{{ msg.sender.username }}</strong>
-          {% endif %}
-          : {{ msg.content|linebreaksbr }}<br><small>{{ msg.timestamp }}</small>
-        </p>
+              {% if msg.sender.is_advisor %}
+                <a href="{% url 'advisor_profile' user_id=msg.sender.id %}">{{ msg.sender.username }}</a>
+              {% else %}
+                {{ msg.sender.username }}
+              {% endif %}
+            </strong><br>
+            {{ msg.content|linebreaksbr }}<br>
+            <small>{{ msg.timestamp|date:"Y-m-d H:i" }}</small>
+          </div>
+        </div>
       {% endif %}
     {% endfor %}
   </div>
+
 
 
     <form method="post" action="{% url 'chat' %}">
