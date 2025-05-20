@@ -7,21 +7,35 @@
     {% csrf_token %}
 
     <!-- 記録日 -->
-    <div>
-      <label>{{ form.record_date.label }}</label><br>
+    <div class="form-block">
+      {{ form.record_date.label_tag }}
       {{ form.record_date }}
     </div>
 
-    <!-- 肌の写真 -->
-    <div>
-      <label>{{ form.photo.label }}</label><br>
-      {{ form.photo }}<br>
-      <button type="button" id="preview-button">現在の肌の写真を登録</button><br>
-      <img id="preview-image" src="#" style="max-width:200px; display:none; margin-top:10px;">
-    </div>
+  <!-- 肌の写真 -->
+  <div class="form-block">
+    {{ form.photo.label_tag }}
+
+    {% if form.photo.value %}
+      <div style="margin-top: 4px;">
+        {{ form.photo.clear_checkbox }} {{ form.photo.clear_checkbox.label }}
+      </div>
+    {% endif %}
+
+    {{ form.photo.as_widget }}
+
+    <br>
+    <button type="button" id="preview-button" class="btn-sub">現在の肌の写真を登録</button>
+    <br>
+    <img id="preview-image" src="#" style="max-width:200px; display:none; margin-top:10px;">
+  </div>
+
+
+
+
 
     <!-- 肌の調子 -->
-    <div>
+    <div class="form-block">
       <strong>{{ form.skin_rating.label }}</strong>
       <div class="skin-rating-widget">
         {% for radio in form.skin_rating %}
@@ -42,21 +56,22 @@
     </div>
 
     <!-- 肌の状態メモ -->
-    <p>{{ form.skin_condition.label_tag }}<br>{{ form.skin_condition }}</p>
+    <p class="form-block">{{ form.skin_condition.label_tag }}<br>{{ form.skin_condition }}</p>
 
     <!-- 朝 -->
-    <div>
-      <h3>🌞 朝に使ったアイテム</h3>
+    <div class="form-block">
+      <label class="section-title">🌞 朝に使ったアイテム</label>
       <div id="morning-inputs"></div>
-      <button type="button" id="add-morning-item">＋項目を追加する</button>
+      <button type="button" id="add-morning-item" class="btn-sub">＋項目を追加する</button>
     </div>
 
     <!-- 夜 -->
-    <div>
-      <h3>🌙 夜に使ったアイテム</h3>
+    <div class="form-block">
+      <label class="section-title">🌙 夜に使ったアイテム</label>
       <div id="night-inputs"></div>
-      <button type="button" id="add-night-item">＋項目を追加する</button>
+      <button type="button" id="add-night-item" class="btn-sub">＋項目を追加する</button>
     </div>
+
 
     <!-- hidden -->
     <input type="hidden" name="morning_items" id="id_morning_items" value="{{ form.initial.morning_items|default:''|escape }}">
@@ -64,7 +79,7 @@
     <input type="hidden" name="ingredients" id="id_ingredients" value="{{ form.initial.ingredients|default:''|escape }}">
 
     <div class="form-actions">
-      <button type="submit" style="margin-top: 20px;">記録する</button>
+      <button type="submit">記録する</button>
     </div>
   </form>
 </div>
@@ -83,7 +98,7 @@ document.addEventListener("DOMContentLoaded", function () {
     row.className = "item-row";
     row.innerHTML = `
       <div class="row-header">
-        <button type="button" class="remove-btn">－</button>
+        <button type="button" class="remove-btn btn-danger">－</button>
         <label class="item-label">${count + 1}番目：</label>
       </div>
       <input type="text" class="${prefix}-input-category" value="${category}" placeholder="カテゴリ（例：化粧水）">

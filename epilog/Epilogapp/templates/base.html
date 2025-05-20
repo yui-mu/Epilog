@@ -9,7 +9,7 @@
       background-color: #f5f9f6; /* やさしいミントベース */
       color: #333;
       margin: 0;
-      padding: 20px;
+      padding: 70px 20px 20px;
     }
   
     nav {
@@ -21,6 +21,11 @@
       align-items: center;
       margin-bottom: 30px;
       border-bottom: 1px solid #c1d4c9;
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      z-index: 1000;
     }
   
     nav a {
@@ -48,20 +53,135 @@
     }
   
     button, input[type="submit"] {
-      background-color: #a7d7c5;
-      color: white;
+      background-color: #b2dfdb;     /* やさしい青緑系（やや濃く） */
+      color: #2f4f4f;                /* ダークグレーで可読性UP */
       padding: 10px 20px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    button:hover, input[type="submit"]:hover {
+      background-color: #80cbc4;     /* ホバー時に濃く */
+    }
+
+    .btn-profile {
+      font-size: 1.1rem;
+      padding: 14px 28px;
+      background-color: #b2dfdb;
+      color: #2f4f4f;
+      border: none;
+      border-radius: 10px;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn-profile:hover {
+      background-color: #86cbb0;
+    }
+
+
+
+
+    /* メインボタン（例：記録する） */
+    .btn-main {
+      background-color: #b2dfdb;
+      color: #2f4f4f;
       border: none;
       border-radius: 8px;
       font-size: 1rem;
       cursor: pointer;
       transition: background-color 0.3s;
+      margin-top: 20px;  /* 上にしっかり余白を作る */
+      margin-bottom: 10px;
     }
-  
-    button:hover, input[type="submit"]:hover {
+    .btn-main:hover {
       background-color: #86cbb0;
     }
-  
+
+    /* サブボタン（例：項目追加・写真登録） */
+    .btn-sub {
+      background-color: #a0c4ff;
+      color: white;
+      padding: 8px 16px;
+      border: none;
+      border-radius: 8px;
+      font-size: 0.95rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+      margin-top: 10px;   /* 上に余白 */
+      margin-bottom: 20px; /* 下に余白 */
+    }
+    .btn-sub:hover {
+      background-color: #89b8ff;
+    }
+
+    /* 削除ボタン（例：－） */
+    .btn-danger {
+      background-color: #f4a5ae;
+      color: white;
+      padding: 6px 12px;
+      border: none;
+      border-radius: 6px;
+      font-size: 0.9rem;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .btn-danger:hover {
+      background-color: #e98d96;
+    }
+
+    .btn-logout {
+      background-color: #f4a5ae;
+      color: white;
+      padding: 10px 20px;  /* 高さを確保！ */
+      margin-right: 40px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .btn-logout:hover {
+      background-color: #e98d96;
+    }
+
+    .item-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;  /* 各入力欄とボタンの間のスペース */
+      margin-bottom: 12px;  /* アイテムごとの下に余白 */
+      flex-wrap: wrap;
+    }
+
+    .item-row input[type="text"] {
+      padding: 8px;
+      height: 38px;
+      font-size: 1rem;
+      border: 1px solid #ccc;
+      border-radius: 6px;
+      width: 180px;
+    }
+
+    .remove-btn {
+      padding: 8px 12px;
+      font-size: 1rem;
+      border-radius: 6px;
+    }
+
+    .row-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+
     .card {
       background-color: white;
       border: 1px solid #ddd;
@@ -77,6 +197,60 @@
       font-weight: bold;
       margin-bottom: 30px;
     }
+
+    .form-block {
+      margin-bottom: 20px;
+    }
+
+    .form-block label {
+      display: inline-block;
+      margin-bottom: 6px;
+    }
+
+    .form-block label {
+      font-weight: 600;
+      display: inline-block;
+      margin-bottom: 6px;
+      font-size: 1rem;
+      color: #333;  
+    }
+
+    .section-title {
+      font-size: 16px;  /* 他のテキストに合わせる */
+      font-weight: bold;
+      display: block;
+      margin-bottom: 8px;
+    }
+    
+    #preview-button {
+      margin-top: 8px;
+      margin-bottom: 10px;
+    }
+
+    #preview-image {
+      margin-top: 10px;
+      display: block;
+    }
+
+    .chat-end-btn {
+      background-color: #D9D7F1;
+      color: #333;
+      border: 1px solid #bcbad5;
+      padding: 6px 14px;
+      border-radius: 6px;
+      font-size: 14px;
+      font-weight: 500;
+      cursor: pointer;
+      margin-top: 10px;   /* 上に余白 */
+      margin-bottom: 20px; /* 下に余白 */
+    }
+
+    .chat-end-btn:hover {
+      background-color: #C5C3E0;
+    }
+    
+    
+
   </style>
 </head>
 <body>
@@ -84,35 +258,36 @@
     {% block navigation %}
       <nav style="display: flex; align-items: center; justify-content: space-between;">
         <div style="display: flex; align-items: center; gap: 12px;">
-        <span style="font-weight: bold; color: #2e5947; font-size: 1.2rem;">EpiLog</span>
-        <a href="{% url 'home' %}">記録</a>
-        <a href="{% url 'product_search' %}">商品検索</a>
-        <a href="{% url 'favorite_list' %}">お気に入り</a>
-        <a href="{% url 'chat' %}">相談</a>  
-        <a href="{% url 'profile' %}">プロフィール</a>
-        <a href="{% url 'record_list' %}">履歴一覧</a>
-        {% if user.is_advisor %}
-          <a href="{% url 'chat_user_list' %}">ユーザー一覧</a>
-        {% endif %}
-      </div>
+          <span style="font-weight: bold; color: #2e5947; font-size: 1.2rem;">EpiLog</span>
+          <a href="{% url 'home' %}">記録</a>
+          <a href="{% url 'product_search' %}">商品検索</a>
+          <a href="{% url 'favorite_list' %}">お気に入り</a>
+          <a href="{% url 'chat' %}">相談</a>  
+          <a href="{% url 'profile' %}">プロフィール</a>
+          <a href="{% url 'record_list' %}">履歴一覧</a>
+          {% if user.is_advisor %}
+            <a href="{% url 'chat_user_list' %}">ユーザー一覧</a>
+          {% endif %}
+        </div>
 
-      <div>
-        <form method="post" action="{% url 'logout' %}" style="display:inline;">
-          {% csrf_token %}
-          <button type="submit" style="...">ログアウト</button>
-        </form>      
-      </div>  
+        <div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+          <span style="font-size: 0.9em; color: #2e5947; white-space: nowrap;">
+            ログイン中：<strong>{{ user.nickname }}</strong> さん
+          </span>
+          <form method="post" action="{% url 'logout' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn-logout">
+              ログアウト
+            </button>
+          </form>
+        </div>
       </nav>
     {% endblock %}
   {% endif %}
 
   <div class="container">
 
-    {% if user.is_authenticated %}
-      <p style="text-align: right; font-size: 0.9em; color: #444; margin: 0 0 10px;">
-        ログイン中：<strong>{{ user.nickname }}</strong> さん
-      </p>
-    {% endif %}
+    
   
     {% block content %}
     <!-- 各ページの内容 -->
