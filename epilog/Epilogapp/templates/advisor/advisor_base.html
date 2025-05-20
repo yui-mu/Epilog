@@ -36,8 +36,8 @@
     }
 
     button {
-      background-color: #a7d7c5;
-      color: white;
+      background-color: #b2dfdb;     
+      color: #2f4f4f;
       padding: 10px 20px;
       border: none;
       border-radius: 8px;
@@ -47,6 +47,40 @@
     }
 
     button:hover {
+      background-color: #86cbb0;
+    }
+
+    .btn-logout {
+      background-color: #f4a5ae;
+      color: white;
+      padding: 10px 20px;  /* 高さを確保！ */
+      margin-right: 40px;
+      border: none;
+      border-radius: 8px;
+      font-size: 1rem;
+      white-space: nowrap;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+    .btn-logout:hover {
+      background-color: #e98d96;
+    }
+
+
+    .btn-profile {
+      font-size: 1.1rem;
+      padding: 8px 16px;
+      background-color: #b2dfdb;
+      color: #2f4f4f;
+      border: none;
+      border-radius: 10px;
+      text-decoration: none;
+      display: inline-block;
+      cursor: pointer;
+      transition: background-color 0.3s;
+    }
+
+    .btn-profile:hover {
       background-color: #86cbb0;
     }
 
@@ -71,11 +105,16 @@
       <a href="{% url 'advisor_completed_chats' %}">チャット対応済</a>
       <a href="{% url 'advisor_profile' %}">プロフィール</a>
     </div>
-    <div>
-      <form method="post" action="{% url 'logout' %}" style="display:inline;">
-        {% csrf_token %}
-        <button type="submit">ログアウト</button>
-      </form>
+　　<div style="display: flex; align-items: center; gap: 12px; flex-shrink: 0;">
+          <span style="font-size: 0.9em; color: #2e5947; white-space: nowrap;">
+            ログイン中：<strong>{{ user.nickname }}</strong> さん
+          </span>
+          <form method="post" action="{% url 'logout' %}" style="display:inline;">
+            {% csrf_token %}
+            <button type="submit" class="btn-logout">
+              ログアウト
+            </button>
+          </form>
     </div>
   </nav>
 

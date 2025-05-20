@@ -8,9 +8,8 @@
     <li style="margin-bottom: 10px;">
       {{ session.user.username }} さん（{{ session.ended_at|date:"Y-m-d H:i" }} 終了）
       <a href="{% url 'advisor_active_chats' %}?session_id={{ session.id }}"
-         style="background-color: #a7d7c5; color: white; padding: 6px 12px; border-radius: 6px;
-                text-decoration: none; font-size: 0.9rem; margin-left: 8px;">
-        詳細
+         style="margin-left: 8px;">
+        <button type="submit" class="btn">詳細</button>
       </a>
     </li>
   {% empty %}

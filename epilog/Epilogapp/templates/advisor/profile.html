@@ -33,8 +33,8 @@
     <p><strong>資格：</strong><br>{{ user.certification|default:"ー" }}</p>
     <p><strong>対応可能時間：</strong><br>{{ user.available_time|default:"ー" }}</p>
 
-    <a href="{% url 'edit_advisor_profile' %}" style="display: inline-block; padding: 10px 20px; background-color: #9dd3c5; color: white; text-decoration: none; border-radius: 6px;">
-          プロフィールを編集する
+    <a href="{% url 'edit_advisor_profile' %}" class="btn-profile">
+          プロフィール編集
     </a>
   </div>
 </div>
